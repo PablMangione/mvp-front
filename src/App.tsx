@@ -5,7 +5,10 @@ import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { StudentDashboard } from './pages/student/Dashboard';
+import {Profile} from "./pages/student/Profile";
+import { Enrollments } from './pages/student/Enrollment'
 import { Subjects } from './pages/student/Subjects';
+import { GroupRequests } from './pages/student/GroupRequest';
 import './App.css';
 
 function App() {
@@ -24,9 +27,9 @@ function App() {
                     <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
                         <Route path="/student/dashboard" element={<StudentDashboard />} />
                         <Route path="/student/subjects" element={<Subjects />} />
-                        {/* <Route path="/student/profile" element={<StudentProfile />} /> */}
-                        {/* <Route path="/student/enrollments" element={<StudentEnrollments />} /> */}
-                        {/* <Route path="/student/group-requests" element={<StudentGroupRequests />} /> */}
+                        { <Route path="/student/profile" element={<Profile />} /> }
+                        { <Route path="/student/enrollments" element={<Enrollments />} /> }
+                        { <Route path="/student/group-requests" element={<GroupRequests />} /> }
                     </Route>
 
                     {/* Rutas protegidas para profesores */}

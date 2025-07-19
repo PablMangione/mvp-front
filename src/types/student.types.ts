@@ -53,3 +53,36 @@ export interface StudentProfile {
     createdAt: string;
     updatedAt?: string;
 }
+
+export interface StudentProfile {
+    id: number;
+    name: string;
+    email: string;
+    major: string;
+    createdAt: string;
+    updatedAt?: string;
+}
+
+export interface GroupRequest {
+    id: number;
+    studentId: number;
+    studentName: string;
+    subjectId: number;
+    subjectName: string;
+    createdAt: string;
+    status: 'PENDING' | 'APPROVED' | 'REJECTED';
+    comments?: string;
+    adminComments?: string;
+}
+
+export interface CreateGroupRequest {
+    subjectId: number;
+    comments?: string;
+}
+
+export interface GroupRequestResponse {
+    requestId: number;
+    success: boolean;
+    message: string;
+    totalRequests: number;
+}
