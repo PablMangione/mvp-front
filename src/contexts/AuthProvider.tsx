@@ -19,7 +19,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     // Verificar si hay una sesión activa al cargar la app
     useEffect(() => {
-        checkAuthStatus();
+        let isMounted = true;
+
+        const checkAuth = async () => {
+            if (isMounted) {
+                await checkAuthStatus();
+            }
+        };
+
+        checkAuth();
+
+        // Cleanup function para evitar actualizaciones en componentes desmontados
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
     const checkAuthStatus = async () => {
@@ -37,17 +50,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const login = async (credentials: LoginRequest) => {
         try {
             setError(null);
-            const response = await authApi.login(credentials);
+            // authApi.login devuelve { success, data: LoginUser, timestamp }
+            const { data: userData } = await authApi.login(credentials);
+
             setUser({
-                id: response.id,
-                name: response.name,
-                email: response.email,
-                role: response.role,
-                major: response.major,
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                role: userData.role,
+                major: userData.major,
             });
         } catch (error) {
             const axiosError = error as AxiosError<ErrorResponse>;
-            const errorMessage = axiosError.response?.data?.message || 'Error al iniciar sesión';
+            const errorMessage =
+                axiosError.response?.data?.message || 'Error al iniciar sesión';
             setError(errorMessage);
             throw error;
         }
@@ -56,13 +72,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const register = async (data: RegisterRequest) => {
         try {
             setError(null);
-            const response = await authApi.register(data);
+            const { data: userData } = await authApi.register(data);
             setUser({
-                id: response.id,
-                name: response.name,
-                email: response.email,
-                role: response.role,
-                major: response.major,
+                id: userData.id,
+                name: userData.name,
+                email: userData.email,
+                role: userData.role,
+                major: userData.major,
             });
         } catch (error) {
             const axiosError = error as AxiosError<ErrorResponse>;

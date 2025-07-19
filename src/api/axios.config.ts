@@ -19,8 +19,11 @@ axiosInstance.interceptors.response.use(
     (error) => {
         // Manejar errores globalmente
         if (error.response?.status === 401) {
-            // Redirigir a login si no está autenticado
-            window.location.href = '/login';
+            // Solo redirigir si NO estamos en la página de login
+            const currentPath = window.location.pathname;
+            if (currentPath !== '/login' && currentPath !== '/register') {
+                window.location.href = '/login';
+            }
         }
 
         // Rechazar la promesa con el error

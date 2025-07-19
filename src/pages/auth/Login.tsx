@@ -5,7 +5,7 @@ import './Login.css';
 
 export const Login: React.FC = () => {
     const navigate = useNavigate();
-    const { login, user, error, clearError } = useAuth();
+    const { login, user, error, clearError, loading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -16,7 +16,7 @@ export const Login: React.FC = () => {
 
     useEffect(() => {
         // Si ya está autenticado, redirigir según su rol
-        if (user) {
+        if (user && !authLoading) {
             switch (user.role) {
                 case 'STUDENT':
                     navigate('/student/dashboard');
@@ -27,9 +27,11 @@ export const Login: React.FC = () => {
                 case 'ADMIN':
                     navigate('/admin/dashboard');
                     break;
+                default:
+                    console.error('Unknown role:', user.role); // Debug
             }
         }
-    }, [user, navigate]);
+    }, [user, navigate, authLoading]);
 
     useEffect(() => {
         // Limpiar errores al desmontar el componente
@@ -60,6 +62,18 @@ export const Login: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    // Mostrar loading mientras verifica la autenticación
+    if (authLoading) {
+        return (
+            <div className="login-container">
+                <div className="login-card">
+                    <h1>ACAInfo</h1>
+                    <p style={{ textAlign: 'center' }}>Verificando sesión...</p>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="login-container">

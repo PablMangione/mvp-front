@@ -5,12 +5,18 @@ export interface LoginRequest {
     password: string;
 }
 
-export interface LoginResponse {
+export interface LoginUser {
     id: number;
     name: string;
     email: string;
     role: UserRole;
     major?: string; // Solo para estudiantes
+}
+
+export interface LoginResponse {
+    success: boolean;
+        data: LoginUser;
+    timestamp: string;  // p.ej. "2025-07-19T18:32:29"
 }
 
 export interface RegisterRequest {

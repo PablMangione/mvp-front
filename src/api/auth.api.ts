@@ -26,7 +26,8 @@ export const authApi = {
 
     // Obtener usuario actual
     getCurrentUser: async (): Promise<User> => {
-        const response = await axiosInstance.get<User>('/auth/me');
-        return response.data;
+        const response = await axiosInstance.get<any>('/auth/me');
+        // El backend devuelve ApiResponseDto con data dentro
+        return response.data.data || response.data;
     },
 };
