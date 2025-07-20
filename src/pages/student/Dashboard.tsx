@@ -117,10 +117,10 @@ export const StudentDashboard: React.FC = () => {
 
             <main className="dashboard-main">
                 <div className="welcome-section">
-                    <h2>Bienvenido, {user?.name}!</h2>
+                    <h2>Bienvenido, {user?.name || 'Estudiante'}!</h2>
                     <p className="student-info">
-                        <strong>Email:</strong> {user?.email}<br />
-                        <strong>Carrera:</strong> {user?.major}
+                        <strong>Email:</strong> {user?.email || 'No disponible'}<br />
+                        <strong>Carrera:</strong> {user?.major || stats?.major || 'No disponible'}
                     </p>
                 </div>
 
@@ -138,7 +138,7 @@ export const StudentDashboard: React.FC = () => {
                     </div>
 
                     <div className="dashboard-card">
-                        <h3>Asignaturas Disponibles</h3>
+                        <h3>Asignaturas Disponibles (no matriculadas)</h3>
                         <p className="card-number">{stats?.remainingSubjects || 0}</p>
                         <p className="card-description">Asignaturas de tu carrera por cursar</p>
                         <button
