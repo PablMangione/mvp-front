@@ -86,3 +86,22 @@ export interface GroupRequestResponse {
     message: string;
     totalRequests: number;
 }
+
+export interface StudentStats {
+    studentId: number;
+    studentName: string;
+    major: string;
+    totalEnrollments: number;
+    activeEnrollments: number;
+    pendingPayments: number;
+    totalSubjectsInMajor: number;
+    enrolledSubjects: number;
+    remainingSubjects: number;
+}
+
+export interface GroupRequestStats {
+    total: number;
+    pending: number;
+    approved: number;
+    rejected: number;
+}

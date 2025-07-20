@@ -151,6 +151,7 @@
     font-weight: bold;
     color: #3498db;
     margin: 0.5rem 0;
+    min-height: 3rem;
 }
 
 .card-description {
@@ -193,6 +194,61 @@
     font-style: italic;
 }
 
+/* Progress Stats Section */
+.progress-stats {
+    background-color: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.progress-stats p {
+    margin: 0.5rem 0;
+    color: #495057;
+    font-size: 0.95rem;
+}
+
+.progress-stats strong {
+    color: #2c3e50;
+}
+
+/* Loading and Error States */
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    font-size: 1.1rem;
+    color: #666;
+}
+
+.error-message {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 2rem;
+    border-radius: 8px;
+    margin: 2rem auto;
+    text-align: center;
+    max-width: 600px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.retry-button {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    margin-top: 1rem;
+    transition: background-color 0.3s;
+}
+
+.retry-button:hover {
+    background-color: #c82333;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
     .header-content {
@@ -209,5 +265,13 @@
 
     .dashboard-grid {
         grid-template-columns: 1fr;
+    }
+
+    .progress-stats {
+        padding: 1rem;
+    }
+
+    .progress-stats p {
+        font-size: 0.9rem;
     }
 }

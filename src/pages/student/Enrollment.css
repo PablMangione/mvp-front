@@ -3,7 +3,7 @@
     background-color: #f5f5f5;
 }
 
-/* Header - Reutilizamos estilos base */
+/* Header */
 .enrollments-header {
     background-color: #2c3e50;
     color: white;
@@ -11,7 +11,7 @@
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-.header-content {
+.enrollments-header .header-content {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 2rem;
@@ -25,17 +25,17 @@
     margin: 0;
 }
 
-.header-actions {
+.enrollments-header .header-actions {
     display: flex;
     align-items: center;
     gap: 1.5rem;
 }
 
-.user-name {
+.enrollments-header .user-name {
     font-size: 0.9rem;
 }
 
-.logout-button {
+.enrollments-header .logout-button {
     background-color: #e74c3c;
     color: white;
     border: none;
@@ -46,7 +46,7 @@
     transition: background-color 0.3s;
 }
 
-.logout-button:hover {
+.enrollments-header .logout-button:hover {
     background-color: #c0392b;
 }
 
@@ -66,7 +66,7 @@
     gap: 2rem;
 }
 
-.nav-link {
+.enrollments-nav .nav-link {
     display: block;
     color: #ecf0f1;
     padding: 1rem 0;
@@ -75,16 +75,16 @@
     position: relative;
 }
 
-.nav-link:hover {
+.enrollments-nav .nav-link:hover {
     color: #3498db;
     text-decoration: none;
 }
 
-.nav-link.active {
+.enrollments-nav .nav-link.active {
     color: #3498db;
 }
 
-.nav-link.active::after {
+.enrollments-nav .nav-link.active::after {
     content: '';
     position: absolute;
     bottom: 0;
@@ -136,7 +136,7 @@
     margin-bottom: 2rem;
 }
 
-.stat-card {
+.enrollment-stats .stat-card {
     background-color: white;
     padding: 1.5rem;
     border-radius: 8px;
@@ -144,13 +144,13 @@
     text-align: center;
 }
 
-.stat-card h3 {
+.enrollment-stats .stat-card h3 {
     margin: 0;
     font-size: 2rem;
     color: #3498db;
 }
 
-.stat-card p {
+.enrollment-stats .stat-card p {
     margin: 0.5rem 0 0;
     color: #666;
     font-size: 0.9rem;
@@ -200,10 +200,8 @@
 .enrollment-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .enrollment-header h3 {
@@ -212,11 +210,12 @@
     font-size: 1.2rem;
 }
 
-/* Badges */
-.payment-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
+/* Badge Styles */
+.payment-badge,
+.group-type-badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
     font-weight: 500;
 }
 
@@ -235,13 +234,6 @@
     color: #721c24;
 }
 
-.group-type-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
 .group-type-badge.regular {
     background-color: #e3f2fd;
     color: #1565c0;
@@ -254,14 +246,19 @@
 
 /* Enrollment Info */
 .enrollment-info {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.info-row:last-child {
+    border-bottom: none;
 }
 
 .info-row .label {
@@ -278,19 +275,17 @@
 .enrollment-actions {
     display: flex;
     gap: 0.5rem;
-    flex-wrap: wrap;
+    margin-top: 1rem;
 }
 
 .enrollment-actions button {
     flex: 1;
-    min-width: 120px;
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 1rem;
     border: none;
     border-radius: 4px;
     cursor: pointer;
     font-size: 0.9rem;
-    font-weight: 500;
-    transition: all 0.3s;
+    transition: background-color 0.3s;
 }
 
 .pay-btn {
@@ -370,13 +365,13 @@
 }
 
 /* Loading y Error */
-.loading {
+.enrollments-main .loading {
     text-align: center;
     padding: 2rem;
     color: #666;
 }
 
-.error-message {
+.enrollments-main .error-message {
     background-color: #f8d7da;
     color: #721c24;
     padding: 1rem;
@@ -386,6 +381,12 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+    .enrollments-header .header-content {
+        flex-direction: column;
+        gap: 1rem;
+        text-align: center;
+    }
+
     .enrollments-header-section {
         flex-direction: column;
         gap: 1rem;

@@ -1,5 +1,13 @@
 import axiosInstance from './axios.config';
-import type {Subject, CourseGroup, EnrollmentSummary, StudentProfile, GroupRequest, CreateGroupRequest, GroupRequestResponse} from '../types/student.types';
+import type {
+    Subject,
+    CourseGroup,
+    EnrollmentSummary,
+    StudentProfile,
+    GroupRequest,
+    CreateGroupRequest,
+    GroupRequestResponse, StudentStats
+} from '../types/student.types';
 
 export const studentApi = {
     // Obtener perfil del estudiante
@@ -25,7 +33,7 @@ export const studentApi = {
 
     // Obtener grupos de una asignatura
     getSubjectGroups: async (subjectId: number): Promise<CourseGroup[]> => {
-        const response = await axiosInstance.get<any>(`/subjects/${subjectId}/groups`);
+        const response = await axiosInstance.get<any>(`/students/subjects/${subjectId}/groups`);
         return response.data.data || response.data;
     },
 
@@ -78,5 +86,10 @@ export const studentApi = {
     canRequestGroup: async (subjectId: number): Promise<boolean> => {
         const response = await axiosInstance.get<any>(`/students/group-requests/can-request/${subjectId}`);
         return response.data;
+    },
+
+    getStats: async (): Promise<StudentStats> => {
+        const response = await axiosInstance.get<any>('/students/stats');
+        return response.data.data || response.data;
     }
 };
