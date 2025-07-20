@@ -1,69 +1,172 @@
-/* src/components/student/StudentLayout.css */
+/* src/components/student/StudentHeader.css */
 
-/* Layout Container */
-.student-layout {
+/* Header Container */
+.student-header {
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     display: flex;
-    min-height: 100vh;
-    background-color: #f5f5f5;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-/* Main Content Area */
-.student-layout__main {
-    flex: 1;
+/* Left Section */
+.student-header__left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Menu Button (Mobile) */
+.student-header__menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #2c3e50;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: color 0.3s;
+}
+
+.student-header__menu-btn:hover {
+    color: #3498db;
+}
+
+/* Title */
+.student-header__title {
+    font-size: 1.5rem;
+    color: #2c3e50;
+    margin: 0;
+}
+
+/* Right Section */
+.student-header__right {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+}
+
+/* Notifications (future feature) */
+.student-header__notifications {
+    position: relative;
+}
+
+.student-header__notification-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #7f8c8d;
+    cursor: pointer;
+    padding: 0.5rem;
+    position: relative;
+    transition: color 0.3s;
+}
+
+.student-header__notification-btn:hover {
+    color: #2c3e50;
+}
+
+.notification-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background-color: #e74c3c;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* User Section */
+.student-header__user {
+    position: relative;
+}
+
+.student-header__user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: none;
+    border: 1px solid #e0e0e0;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.student-header__user-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #3498db;
+}
+
+/* User Avatar */
+.student-header__user-avatar {
+    width: 35px;
+    height: 35px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+/* User Info */
+.student-header__user-info {
+    text-align: left;
     display: flex;
     flex-direction: column;
-    margin-left: 250px; /* Width of sidebar */
-    transition: margin-left 0.3s ease;
+    gap: 0.2rem;
 }
 
-/* When sidebar is collapsed */
-.student-layout__main.sidebar-collapsed {
-    margin-left: 80px; /* Width of collapsed sidebar */
+.student-header__user-name {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: #2c3e50;
 }
 
-/* Content Container */
-.student-layout__content {
-    flex: 1;
-    padding: 2rem;
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
+.student-header__user-email {
+    font-size: 0.8rem;
+    color: #7f8c8d;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
-    .student-layout__main {
-        margin-left: 0;
-    }
-
-    .student-layout__content {
-        padding: 1.5rem;
-    }
+/* Dropdown Arrow */
+.student-header__dropdown-arrow {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    transition: transform 0.3s;
 }
 
-@media (max-width: 768px) {
-    .student-layout {
-        flex-direction: column;
-    }
-
-    .student-layout__main {
-        margin-left: 0;
-    }
-
-    .student-layout__main.sidebar-collapsed {
-        margin-left: 0;
-    }
-
-    .student-layout__content {
-        padding: 1rem;
-    }
+.student-header__user-btn:hover .student-header__dropdown-arrow {
+    transform: translateY(2px);
 }
 
-/* Animations */
-@keyframes fadeIn {
+/* Dropdown Menu */
+.student-header__dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    min-width: 200px;
+    z-index: 1000;
+    animation: dropdownFadeIn 0.2s ease-out;
+}
+
+@keyframes dropdownFadeIn {
     from {
         opacity: 0;
-        transform: translateY(10px);
+        transform: translateY(-10px);
     }
     to {
         opacity: 1;
@@ -71,6 +174,91 @@
     }
 }
 
-.student-layout__content > * {
-    animation: fadeIn 0.3s ease-out;
+/* Dropdown Header */
+.student-header__dropdown-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.student-header__dropdown-name {
+    font-weight: 500;
+    color: #2c3e50;
+    margin: 0 0 0.25rem 0;
+}
+
+.student-header__dropdown-email {
+    font-size: 0.85rem;
+    color: #7f8c8d;
+    margin: 0 0 0.25rem 0;
+}
+
+.student-header__dropdown-major {
+    font-size: 0.85rem;
+    color: #3498db;
+    margin: 0;
+}
+
+/* Dropdown Divider */
+.student-header__dropdown-divider {
+    height: 1px;
+    background-color: #e0e0e0;
+    margin: 0;
+}
+
+/* Dropdown Items */
+.student-header__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    font-size: 0.9rem;
+}
+
+.student-header__dropdown-item:hover {
+    background-color: #f8f9fa;
+}
+
+.student-header__logout {
+    color: #e74c3c;
+}
+
+.student-header__logout:hover {
+    background-color: #fee;
+}
+
+/* Mobile Styles */
+@media (max-width: 1024px) {
+    .student-header__menu-btn {
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .student-header {
+        padding: 1rem;
+    }
+
+    .student-header__title {
+        font-size: 1.2rem;
+    }
+
+    .student-header__user-info {
+        display: none;
+    }
+
+    .student-header__dropdown-arrow {
+        display: none;
+    }
+
+    .student-header__user-btn {
+        padding: 0.5rem;
+        border: none;
+    }
 }

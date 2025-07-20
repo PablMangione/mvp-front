@@ -1,7 +1,7 @@
 import React, { useState, useEffect, type ReactNode } from 'react';
 import { AxiosError } from 'axios';
 import type { User, LoginRequest, RegisterRequest } from '../types/auth.types';
-import { authApi } from '../api/auth.api';
+import { authApi } from '../services/auth/auth.api.ts';
 import { AuthContext } from './auth.context';
 
 interface AuthProviderProps {

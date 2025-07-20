@@ -1,20 +1,24 @@
 // src/pages/student/Subjects.tsx
 import React, { useState, useEffect } from 'react';
-import {subjectService, enrollmentService} from '../../services/student';
+import { useNavigate } from 'react-router-dom';
+import { subjectService, enrollmentService } from '../../services/student';
+import { SubjectCard } from '../../components/student/SubjectCard';
+import { GroupCard } from '../../components/student/GroupCard';
 import type { Subject, CourseGroup } from '../../types/student.types';
 import './Subjects.css';
 
 /**
- * Página de asignaturas - REFACTORIZADA
- * Removido: header, nav y logout (ahora en StudentLayout)
+ * Página de asignaturas - REFACTORIZADA con componentes reutilizables
  */
 export const Subjects: React.FC = () => {
+    const navigate = useNavigate();
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [selectedYear, setSelectedYear] = useState<number | 'all'>('all');
     const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
     const [subjectGroups, setSubjectGroups] = useState<CourseGroup[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingGroups, setLoadingGroups] = useState(false);
+    const [enrollingGroupId, setEnrollingGroupId] = useState<number | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [enrollmentStatus, setEnrollmentStatus] = useState<string | null>(null);
 
@@ -26,7 +30,6 @@ export const Subjects: React.FC = () => {
         try {
             setLoading(true);
             const data = await subjectService.getMySubjects();
-            console.log('Subjects fetched:', data); // Debug
             setSubjects(data);
         } catch (error) {
             console.error('Error fetching subjects:', error);
@@ -54,6 +57,7 @@ export const Subjects: React.FC = () => {
         if (!selectedSubject) return;
 
         try {
+            setEnrollingGroupId(groupId);
             setEnrollmentStatus('Procesando inscripción...');
             await enrollmentService.enrollInGroup(selectedSubject.id, groupId);
             setEnrollmentStatus('¡Inscripción exitosa!');
@@ -67,6 +71,8 @@ export const Subjects: React.FC = () => {
             const errorMessage = error.response?.data?.message || 'Error al inscribirse';
             setEnrollmentStatus(errorMessage);
             setTimeout(() => setEnrollmentStatus(null), 5000);
+        } finally {
+            setEnrollingGroupId(null);
         }
     };
 
@@ -106,10 +112,15 @@ export const Subjects: React.FC = () => {
 
                 {/* Filtro por año */}
                 <div className="year-filter">
-                    <label>Filtrar por año:</label>
+                    <label htmlFor="year-select">Filtrar por año:</label>
                     <select
+                        id="year-select"
                         value={selectedYear}
-                        onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                        onChange={(e) => {
+                            setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value));
+                            setSelectedSubject(null);
+                            setSubjectGroups([]);
+                        }}
                         className="year-select"
                     >
                         <option value="all">Todos los años</option>
@@ -121,7 +132,7 @@ export const Subjects: React.FC = () => {
                     </select>
                 </div>
 
-                {/* Lista de asignaturas */}
+                {/* Lista de asignaturas usando SubjectCard */}
                 <div className="subjects-grid">
                     {filteredSubjects.length === 0 ? (
                         <div className="no-subjects">
@@ -129,20 +140,12 @@ export const Subjects: React.FC = () => {
                         </div>
                     ) : (
                         filteredSubjects.map(subject => (
-                            <div
+                            <SubjectCard
                                 key={subject.id}
-                                className={`subject-card ${selectedSubject?.id === subject.id ? 'selected' : ''}`}
-                                onClick={() => fetchSubjectGroups(subject)}
-                            >
-                                <h3>{subject.name}</h3>
-                                <div className="subject-info">
-                                    <span className="subject-year">{subject.courseYear}º año</span>
-                                    <span className="subject-major">{subject.major}</span>
-                                </div>
-                                <button className="view-groups-btn">
-                                    Ver Grupos Disponibles
-                                </button>
-                            </div>
+                                subject={subject}
+                                isSelected={selectedSubject?.id === subject.id}
+                                onClick={fetchSubjectGroups}
+                            />
                         ))
                     )}
                 </div>
@@ -150,7 +153,19 @@ export const Subjects: React.FC = () => {
                 {/* Grupos de la asignatura seleccionada */}
                 {selectedSubject && (
                     <div className="groups-section">
-                        <h3>Grupos disponibles para: {selectedSubject.name}</h3>
+                        <div className="groups-section-header">
+                            <h3>Grupos disponibles para: {selectedSubject.name}</h3>
+                            <button
+                                className="close-groups-btn"
+                                onClick={() => {
+                                    setSelectedSubject(null);
+                                    setSubjectGroups([]);
+                                }}
+                                aria-label="Cerrar sección de grupos"
+                            >
+                                ✕
+                            </button>
+                        </div>
 
                         {enrollmentStatus && (
                             <div className={`enrollment-status ${enrollmentStatus.includes('Error') ? 'error' : 'success'}`}>
@@ -162,53 +177,30 @@ export const Subjects: React.FC = () => {
                             <div className="loading-groups">Cargando grupos...</div>
                         ) : subjectGroups.length === 0 ? (
                             <div className="no-groups">
-                                No hay grupos disponibles para esta asignatura.
+                                <p>No hay grupos disponibles para esta asignatura.</p>
+                                <button
+                                    className="request-group-btn"
+                                    onClick={() => {
+                                        navigate('/student/group-requests', {
+                                            state: {
+                                                createNew: true,
+                                                selectedSubjectId: selectedSubject.id
+                                            }
+                                        });
+                                    }}
+                                >
+                                    Solicitar apertura de grupo
+                                </button>
                             </div>
                         ) : (
                             <div className="groups-grid">
                                 {subjectGroups.map(group => (
-                                    <div key={group.id} className="group-card">
-                                        <div className="group-header">
-                                            <h4>Grupo {group.id}</h4>
-                                            <span className={`group-status ${group.status.toLowerCase()}`}>
-                                                {group.status === 'ACTIVE' ? 'Activo' :
-                                                    group.status === 'PLANNED' ? 'Planificado' : 'Cerrado'}
-                                            </span>
-                                        </div>
-
-                                        <div className="group-details">
-                                            <p><strong>Profesor:</strong> {group.teacherName}</p>
-                                            <p><strong>Tipo:</strong> {group.type === 'REGULAR' ? 'Regular' : 'Intensivo'}</p>
-                                            <p><strong>Precio:</strong> ${group.price}</p>
-                                            <p><strong>Cupos:</strong> {group.enrolledStudents}/{group.maxCapacity}</p>
-                                        </div>
-
-                                        {/* Horarios si están disponibles */}
-                                        {group.sessions && group.sessions.length > 0 && (
-                                            <div className="group-schedule">
-                                                <strong>Horario:</strong>
-                                                {group.sessions.map((session, index) => (
-                                                    <div key={index} className="session-info">
-                                                        {session.dayOfWeek}: {session.startTime} - {session.endTime}
-                                                        <span className="classroom"> ({session.classroom})</span>
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-
-                                        <button
-                                            className="enroll-button"
-                                            onClick={() => handleEnrollment(group.id)}
-                                            disabled={
-                                                group.status !== 'ACTIVE' ||
-                                                group.enrolledStudents >= group.maxCapacity
-                                            }
-                                        >
-                                            {group.status !== 'ACTIVE' ? 'No disponible' :
-                                                group.enrolledStudents >= group.maxCapacity ? 'Grupo lleno' :
-                                                    'Inscribirse'}
-                                        </button>
-                                    </div>
+                                    <GroupCard
+                                        key={group.id}
+                                        group={group}
+                                        onEnroll={handleEnrollment}
+                                        isEnrolling={enrollingGroupId === group.id}
+                                    />
                                 ))}
                             </div>
                         )}

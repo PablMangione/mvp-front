@@ -2,12 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { enrollmentService } from '../../services/student';
+import { EnrollmentCard } from '../../components/student/EnrollmentCard';
+import { StatsCard } from '../../components/student/StatsCard';
 import type { EnrollmentSummary } from '../../types/student.types';
 import './Enrollment.css';
 
 /**
- * Página de inscripciones - REFACTORIZADA
- * Removido: header, nav y logout (ahora en StudentLayout)
+ * Página de inscripciones - REFACTORIZADA con componentes reutilizables
  */
 export const Enrollments: React.FC = () => {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ export const Enrollments: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [cancelStatus, setCancelStatus] = useState<string | null>(null);
+    const [cancellingId, setCancellingId] = useState<number | null>(null);
 
     useEffect(() => {
         fetchEnrollments();
@@ -39,6 +41,7 @@ export const Enrollments: React.FC = () => {
         }
 
         try {
+            setCancellingId(enrollmentId);
             setCancelStatus('Cancelando inscripción...');
             await enrollmentService.cancelEnrollment(enrollmentId);
             setCancelStatus('Inscripción cancelada exitosamente');
@@ -51,35 +54,15 @@ export const Enrollments: React.FC = () => {
             const errorMessage = error.response?.data?.message || 'Error al cancelar la inscripción';
             setCancelStatus(errorMessage);
             setTimeout(() => setCancelStatus(null), 5000);
+        } finally {
+            setCancellingId(null);
         }
     };
 
-    const getPaymentStatusBadge = (status: string) => {
-        switch (status) {
-            case 'PAID':
-                return <span className="payment-badge paid">Pagado</span>;
-            case 'PENDING':
-                return <span className="payment-badge pending">Pendiente</span>;
-            case 'FAILED':
-                return <span className="payment-badge failed">Fallido</span>;
-            default:
-                return <span className="payment-badge">{status}</span>;
-        }
-    };
-
-    const getGroupTypeBadge = (type: string) => {
-        return type === 'REGULAR'
-            ? <span className="group-type-badge regular">Regular</span>
-            : <span className="group-type-badge intensive">Intensivo</span>;
-    };
-
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
+    const handlePayment = async (enrollmentId: number) => {
+        // TODO: Implementar lógica de pago
+        console.log('Iniciar proceso de pago para inscripción:', enrollmentId);
+        alert('Función de pago en desarrollo');
     };
 
     // Calcular estadísticas
@@ -121,26 +104,39 @@ export const Enrollments: React.FC = () => {
                     )}
                 </div>
 
-                {/* Estadísticas de inscripciones */}
+                {/* Estadísticas de inscripciones usando StatsCard */}
                 {enrollments.length > 0 && (
-                    <div className="enrollment-stats">
-                        <div className="stat-card">
-                            <h3>{stats.total}</h3>
-                            <p>Total Inscripciones</p>
-                        </div>
-                        <div className="stat-card">
-                            <h3>{stats.paid}</h3>
-                            <p>Pagadas</p>
-                        </div>
-                        <div className="stat-card">
-                            <h3>{stats.pending}</h3>
-                            <p>Pago Pendiente</p>
-                        </div>
+                    <div className="stats-card-grid">
+                        <StatsCard
+                            title="Total Inscripciones"
+                            value={stats.total}
+                            description="Grupos en los que estás inscrito"
+                            icon="📚"
+                        />
+                        <StatsCard
+                            title="Pagadas"
+                            value={stats.paid}
+                            description="Inscripciones pagadas"
+                            icon="✅"
+                        />
+                        <StatsCard
+                            title="Pago Pendiente"
+                            value={stats.pending}
+                            description="Requieren pago"
+                            icon="⏳"
+                            actionLabel={stats.pending > 0 ? "Ver pendientes" : undefined}
+                            onClick={stats.pending > 0 ? () => {
+                                const pendingSection = document.getElementById('pending-enrollments');
+                                pendingSection?.scrollIntoView({ behavior: 'smooth' });
+                            } : undefined}
+                        />
                         {stats.failed > 0 && (
-                            <div className="stat-card">
-                                <h3>{stats.failed}</h3>
-                                <p>Pago Fallido</p>
-                            </div>
+                            <StatsCard
+                                title="Pago Fallido"
+                                value={stats.failed}
+                                description="Requieren atención"
+                                icon="❌"
+                            />
                         )}
                     </div>
                 )}
@@ -165,49 +161,66 @@ export const Enrollments: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    <div className="enrollments-grid">
-                        {enrollments.map(enrollment => (
-                            <div key={enrollment.id} className="enrollment-card">
-                                <div className="enrollment-header">
-                                    <h3>{enrollment.subjectName}</h3>
-                                    {getGroupTypeBadge(enrollment.groupType)}
+                    <>
+                        {/* Inscripciones con pago pendiente */}
+                        {stats.pending > 0 && (
+                            <section id="pending-enrollments" className="enrollments-section">
+                                <h3 className="section-title">⏳ Pagos Pendientes</h3>
+                                <div className="enrollments-grid">
+                                    {enrollments
+                                        .filter(e => e.paymentStatus === 'PENDING')
+                                        .map(enrollment => (
+                                            <EnrollmentCard
+                                                key={enrollment.id}
+                                                enrollment={enrollment}
+                                                onCancel={handleCancelEnrollment}
+                                                onPay={handlePayment}
+                                                isProcessing={cancellingId === enrollment.id}
+                                            />
+                                        ))}
                                 </div>
+                            </section>
+                        )}
 
-                                <div className="enrollment-info">
-                                    <div className="info-row">
-                                        <span className="label">Profesor:</span>
-                                        <span className="value">{enrollment.teacherName}</span>
-                                    </div>
-                                    <div className="info-row">
-                                        <span className="label">Horario:</span>
-                                        <span className="value">{enrollment.schedule}</span>
-                                    </div>
-                                    <div className="info-row">
-                                        <span className="label">Fecha de inscripción:</span>
-                                        <span className="value">{formatDate(enrollment.enrollmentDate)}</span>
-                                    </div>
-                                    <div className="info-row">
-                                        <span className="label">Estado de pago:</span>
-                                        {getPaymentStatusBadge(enrollment.paymentStatus)}
-                                    </div>
+                        {/* Inscripciones pagadas */}
+                        {stats.paid > 0 && (
+                            <section className="enrollments-section">
+                                <h3 className="section-title">✅ Inscripciones Activas</h3>
+                                <div className="enrollments-grid">
+                                    {enrollments
+                                        .filter(e => e.paymentStatus === 'PAID')
+                                        .map(enrollment => (
+                                            <EnrollmentCard
+                                                key={enrollment.id}
+                                                enrollment={enrollment}
+                                                onCancel={handleCancelEnrollment}
+                                                isProcessing={cancellingId === enrollment.id}
+                                            />
+                                        ))}
                                 </div>
+                            </section>
+                        )}
 
-                                <div className="enrollment-actions">
-                                    {enrollment.paymentStatus === 'PENDING' && (
-                                        <button className="pay-button">
-                                            Pagar Ahora
-                                        </button>
-                                    )}
-                                    <button
-                                        className="cancel-button"
-                                        onClick={() => handleCancelEnrollment(enrollment.id)}
-                                    >
-                                        Cancelar Inscripción
-                                    </button>
+                        {/* Inscripciones con pago fallido */}
+                        {stats.failed > 0 && (
+                            <section className="enrollments-section">
+                                <h3 className="section-title">❌ Pagos Fallidos</h3>
+                                <div className="enrollments-grid">
+                                    {enrollments
+                                        .filter(e => e.paymentStatus === 'FAILED')
+                                        .map(enrollment => (
+                                            <EnrollmentCard
+                                                key={enrollment.id}
+                                                enrollment={enrollment}
+                                                onCancel={handleCancelEnrollment}
+                                                onPay={handlePayment}
+                                                isProcessing={cancellingId === enrollment.id}
+                                            />
+                                        ))}
                                 </div>
-                            </div>
-                        ))}
-                    </div>
+                            </section>
+                        )}
+                    </>
                 )}
             </div>
         </div>

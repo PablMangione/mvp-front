@@ -1,5 +1,5 @@
 // src/services/baseService.ts
-import axiosInstance from '../api/axios.config.ts';
+import axiosInstance from './api/apiClient.ts';
 import type {AxiosResponse} from 'axios';
 
 /**

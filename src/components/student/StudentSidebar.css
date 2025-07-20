@@ -1,76 +1,217 @@
-/* src/components/student/StudentLayout.css */
+/* src/components/student/StudentSidebar.css */
 
-/* Layout Container */
-.student-layout {
-    display: flex;
-    min-height: 100vh;
-    background-color: #f5f5f5;
-}
-
-/* Main Content Area */
-.student-layout__main {
-    flex: 1;
+/* Sidebar Container */
+.student-sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100vh;
+    width: 250px;
+    background-color: #2c3e50;
+    color: white;
     display: flex;
     flex-direction: column;
-    margin-left: 250px; /* Width of sidebar */
-    transition: margin-left 0.3s ease;
+    transition: width 0.3s ease;
+    z-index: 1000;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.1);
 }
 
-/* When sidebar is collapsed */
-.student-layout__main.sidebar-collapsed {
-    margin-left: 80px; /* Width of collapsed sidebar */
+/* Collapsed State */
+.student-sidebar.collapsed {
+    width: 80px;
 }
 
-/* Content Container */
-.student-layout__content {
+/* Header Section */
+.student-sidebar__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.student-sidebar__title {
+    font-size: 1.5rem;
+    margin: 0;
+    cursor: pointer;
+    transition: color 0.3s;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.student-sidebar__title:hover {
+    color: #3498db;
+}
+
+.student-sidebar.collapsed .student-sidebar__title {
+    font-size: 1.2rem;
+}
+
+/* Toggle Button */
+.student-sidebar__toggle {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.5rem;
+    transition: transform 0.3s, color 0.3s;
+}
+
+.student-sidebar__toggle:hover {
+    color: #3498db;
+    transform: translateX(2px);
+}
+
+/* Navigation */
+.student-sidebar__nav {
     flex: 1;
-    padding: 2rem;
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
+    padding: 1rem 0;
+    overflow-y: auto;
 }
 
-/* Responsive Design */
+.student-sidebar__menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.student-sidebar__item {
+    margin-bottom: 0.25rem;
+}
+
+/* Navigation Links */
+.student-sidebar__link {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    color: #ecf0f1;
+    text-decoration: none;
+    transition: background-color 0.3s, color 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.student-sidebar__link:hover {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+/* Active Link */
+.student-sidebar__link.active {
+    background-color: rgba(52, 152, 219, 0.2);
+    color: #3498db;
+}
+
+.student-sidebar__link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #3498db;
+}
+
+/* Icons */
+.student-sidebar__icon {
+    font-size: 1.2rem;
+    min-width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Labels */
+.student-sidebar__label {
+    margin-left: 0.75rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity 0.3s;
+}
+
+.student-sidebar.collapsed .student-sidebar__label {
+    opacity: 0;
+    width: 0;
+    margin-left: 0;
+}
+
+/* Footer */
+.student-sidebar__footer {
+    padding: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center;
+    font-size: 0.875rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.student-sidebar__role {
+    margin: 0;
+}
+
+/* Tooltips for collapsed sidebar */
+.student-sidebar.collapsed .student-sidebar__link:hover::after {
+    content: attr(title);
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #34495e;
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    margin-left: 0.5rem;
+}
+
+/* Scrollbar Styling */
+.student-sidebar__nav::-webkit-scrollbar {
+    width: 6px;
+}
+
+.student-sidebar__nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.student-sidebar__nav::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.student-sidebar__nav::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Mobile Styles */
 @media (max-width: 1024px) {
-    .student-layout__main {
-        margin-left: 0;
+    .student-sidebar {
+        transform: translateX(-100%);
     }
 
-    .student-layout__content {
-        padding: 1.5rem;
-    }
-}
-
-@media (max-width: 768px) {
-    .student-layout {
-        flex-direction: column;
+    .student-sidebar.mobile-open {
+        transform: translateX(0);
     }
 
-    .student-layout__main {
-        margin-left: 0;
-    }
-
-    .student-layout__main.sidebar-collapsed {
-        margin-left: 0;
-    }
-
-    .student-layout__content {
-        padding: 1rem;
-    }
-}
-
-/* Animations */
-@keyframes fadeIn {
-    from {
+    /* Overlay for mobile */
+    .student-sidebar::after {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 100%;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
         opacity: 0;
-        transform: translateY(10px);
+        transition: opacity 0.3s;
+        pointer-events: none;
     }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
 
-.student-layout__content > * {
-    animation: fadeIn 0.3s ease-out;
+    .student-sidebar.mobile-open::after {
+        opacity: 1;
+        pointer-events: auto;
+    }
 }

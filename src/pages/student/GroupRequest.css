@@ -1,107 +1,31 @@
+/* src/pages/student/GroupRequest.css - LIMPIO */
+
+/* Container principal */
 .group-requests-container {
     min-height: 100vh;
     background-color: #f5f5f5;
 }
 
-/* Header - Reutilizamos estilos base */
-.group-requests-header {
-    background-color: #2c3e50;
-    color: white;
-    padding: 1rem 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.header-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.group-requests-header h1 {
-    font-size: 1.5rem;
-    margin: 0;
-}
-
-.header-actions {
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-}
-
-.user-name {
-    font-size: 0.9rem;
-}
-
-.logout-button {
-    background-color: #e74c3c;
-    color: white;
-    border: none;
-    padding: 0.5rem 1rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
-}
-
-.logout-button:hover {
-    background-color: #c0392b;
-}
-
-/* Navigation */
-.group-requests-nav {
-    background-color: #34495e;
-    padding: 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.group-requests-nav ul {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 2rem;
-    list-style: none;
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
-}
-
-.nav-link {
-    display: block;
-    color: #ecf0f1;
-    padding: 1rem 0;
-    text-decoration: none;
-    transition: color 0.3s;
-    position: relative;
-}
-
-.nav-link:hover {
-    color: #3498db;
-    text-decoration: none;
-}
-
-.nav-link.active {
-    color: #3498db;
-}
-
-.nav-link.active::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background-color: #3498db;
-}
-
-/* Main Content */
-.group-requests-main {
+/* Contenido principal */
+.group-requests-content {
     max-width: 1200px;
     margin: 0 auto;
     padding: 2rem;
+    animation: fadeIn 0.3s ease-out;
 }
 
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header de página */
 .requests-header-section {
     display: flex;
     justify-content: space-between;
@@ -112,6 +36,7 @@
 .requests-header-section h2 {
     margin: 0;
     color: #2c3e50;
+    font-size: 1.8rem;
 }
 
 .new-request-btn {
@@ -125,39 +50,24 @@
     transition: background-color 0.3s;
 }
 
-.new-request-btn:hover {
+.new-request-btn:hover:not(:disabled) {
     background-color: #229954;
 }
 
-/* Statistics */
-.request-stats {
+.new-request-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
+}
+
+/* Stats Grid - usando el componente StatsCard */
+.stats-card-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 1rem;
     margin-bottom: 2rem;
 }
 
-.stat-card {
-    background-color: white;
-    padding: 1.5rem;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    text-align: center;
-}
-
-.stat-card h3 {
-    margin: 0;
-    font-size: 2rem;
-    color: #3498db;
-}
-
-.stat-card p {
-    margin: 0.5rem 0 0;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-/* Status Messages */
+/* Mensajes de estado */
 .request-status {
     padding: 1rem;
     border-radius: 4px;
@@ -178,7 +88,7 @@
     border: 1px solid #f5c6cb;
 }
 
-/* New Request Form */
+/* Formulario de nueva solicitud */
 .new-request-form-container {
     background-color: white;
     border-radius: 8px;
@@ -212,8 +122,8 @@
 
 .field-hint {
     display: block;
-    font-size: 0.85rem;
     color: #666;
+    font-size: 0.85rem;
     font-weight: normal;
     margin-top: 0.25rem;
 }
@@ -262,8 +172,13 @@
     transition: background-color 0.3s;
 }
 
-.submit-btn:hover {
+.submit-btn:hover:not(:disabled) {
     background-color: #229954;
+}
+
+.submit-btn:disabled {
+    background-color: #95a5a6;
+    cursor: not-allowed;
 }
 
 .cancel-btn {
@@ -278,158 +193,32 @@
     transition: background-color 0.3s;
 }
 
-.cancel-btn:hover {
+.cancel-btn:hover:not(:disabled) {
     background-color: #7f8c8d;
 }
 
-/* Requests Grid */
+/* Sections */
+.requests-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    margin: 0 0 1rem 0;
+    color: #2c3e50;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+/* Requests Grid - para los GroupRequestCard */
 .requests-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
     gap: 1.5rem;
 }
 
-.request-card {
-    background-color: white;
-    border-radius: 8px;
-    padding: 1.5rem;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-}
-
-.request-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
-}
-
-.request-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 1rem;
-    padding-bottom: 1rem;
-    border-bottom: 1px solid #e0e0e0;
-}
-
-.request-header h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 1.2rem;
-}
-
-/* Status Badges */
-.status-badge {
-    padding: 0.25rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.85rem;
-    font-weight: 500;
-}
-
-.status-badge.pending {
-    background-color: #fff3cd;
-    color: #856404;
-}
-
-.status-badge.approved {
-    background-color: #d4edda;
-    color: #155724;
-}
-
-.status-badge.rejected {
-    background-color: #f8d7da;
-    color: #721c24;
-}
-
-/* Request Info */
-.request-info {
-    margin-bottom: 1rem;
-}
-
-.info-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 0.5rem;
-}
-
-.info-row .label {
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.info-row .value {
-    color: #333;
-    font-weight: 500;
-    text-align: right;
-}
-
-/* Comments Sections */
-.comments-section,
-.admin-comments-section {
-    margin-top: 1rem;
-    padding-top: 1rem;
-    border-top: 1px solid #e0e0e0;
-}
-
-.comments-section .label,
-.admin-comments-section .label {
-    display: block;
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-}
-
-.comments-text,
-.admin-comments-text {
-    margin: 0;
-    color: #333;
-    font-size: 0.95rem;
-    line-height: 1.5;
-    background-color: #f8f9fa;
-    padding: 0.75rem;
-    border-radius: 4px;
-}
-
-.admin-comments-text {
-    background-color: #e3f2fd;
-}
-
-/* Request Actions */
-.request-actions {
-    margin-top: 1rem;
-}
-
-.view-groups-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
-}
-
-.view-groups-btn:hover {
-    background-color: #2980b9;
-}
-
-/* Pending Info */
-.pending-info {
-    margin-top: 1rem;
-    padding: 0.75rem;
-    background-color: #fff3cd;
-    border-radius: 4px;
-    text-align: center;
-}
-
-.pending-info p {
-    margin: 0;
-    color: #856404;
-    font-size: 0.9rem;
-}
-
-/* No Requests */
+/* No requests */
 .no-requests {
     background-color: white;
     border-radius: 8px;
@@ -470,40 +259,41 @@
     margin: 1rem 0 0;
 }
 
-/* Loading y Error */
+/* Loading state */
 .loading {
     text-align: center;
     padding: 4rem;
     color: #666;
+    font-size: 1.1rem;
 }
 
+/* Error message */
 .error-message {
     background-color: #f8d7da;
     color: #721c24;
-    padding: 1rem;
+    padding: 1.5rem;
     border-radius: 4px;
     text-align: center;
 }
 
 /* Responsive */
 @media (max-width: 768px) {
+    .group-requests-content {
+        padding: 1rem;
+    }
+
     .requests-header-section {
         flex-direction: column;
         gap: 1rem;
         align-items: flex-start;
     }
 
-    .request-stats {
+    .stats-card-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
     .requests-grid {
         grid-template-columns: 1fr;
-    }
-
-    .group-requests-nav ul {
-        justify-content: center;
-        gap: 1rem;
     }
 
     .form-actions {
@@ -512,14 +302,5 @@
 
     .form-actions button {
         width: 100%;
-    }
-
-    .info-row {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-
-    .info-row .value {
-        text-align: left;
     }
 }

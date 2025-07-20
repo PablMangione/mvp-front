@@ -1,10 +1,10 @@
-import axiosInstance from './axios.config';
+import axiosInstance from '../api/apiClient.ts';
 import type {
     LoginRequest,
     LoginResponse,
     RegisterRequest,
     User
-} from '../types/auth.types';
+} from '../../types/auth.types.ts';
 
 export const authApi = {
     // Login
