@@ -1,14 +1,14 @@
+// src/pages/student/Subjects.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { studentApi } from '../../api/student.api';
-import type {Subject, CourseGroup} from '../../types/student.types';
+import {subjectService, enrollmentService} from '../../services/student';
+import type { Subject, CourseGroup } from '../../types/student.types';
 import './Subjects.css';
 
+/**
+ * Página de asignaturas - REFACTORIZADA
+ * Removido: header, nav y logout (ahora en StudentLayout)
+ */
 export const Subjects: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [selectedYear, setSelectedYear] = useState<number | 'all'>('all');
     const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
@@ -25,7 +25,7 @@ export const Subjects: React.FC = () => {
     const fetchSubjects = async () => {
         try {
             setLoading(true);
-            const data = await studentApi.getMySubjects();
+            const data = await subjectService.getMySubjects();
             console.log('Subjects fetched:', data); // Debug
             setSubjects(data);
         } catch (error) {
@@ -40,7 +40,7 @@ export const Subjects: React.FC = () => {
         try {
             setLoadingGroups(true);
             setSelectedSubject(subject);
-            const groups = await studentApi.getSubjectGroups(subject.id);
+            const groups = await subjectService.getSubjectGroups(subject.id);
             setSubjectGroups(groups);
         } catch (error) {
             console.error('Error fetching groups:', error);
@@ -55,7 +55,7 @@ export const Subjects: React.FC = () => {
 
         try {
             setEnrollmentStatus('Procesando inscripción...');
-            await studentApi.enrollInGroup(selectedSubject.id, groupId);
+            await enrollmentService.enrollInGroup(selectedSubject.id, groupId);
             setEnrollmentStatus('¡Inscripción exitosa!');
 
             // Recargar grupos para actualizar contador
@@ -70,167 +70,139 @@ export const Subjects: React.FC = () => {
         }
     };
 
-    const handleLogout = async () => {
-        await logout();
-        navigate('/login');
-    };
-
     // Filtrar asignaturas por año
     const filteredSubjects = selectedYear === 'all'
         ? subjects
-        : subjects.filter(s => s.courseYear === selectedYear);
+        : subjects.filter(subject => subject.courseYear === selectedYear);
 
     // Obtener años únicos
-    const uniqueYears = [...new Set(subjects.map(s => s.courseYear))].sort();
+    const availableYears = Array.from(new Set(subjects.map(s => s.courseYear))).sort();
 
-    const getDayName = (day: string): string => {
-        const days: Record<string, string> = {
-            'MONDAY': 'Lunes',
-            'TUESDAY': 'Martes',
-            'WEDNESDAY': 'Miércoles',
-            'THURSDAY': 'Jueves',
-            'FRIDAY': 'Viernes',
-            'SATURDAY': 'Sábado',
-            'SUNDAY': 'Domingo'
-        };
-        return days[day] || day;
-    };
+    if (loading) {
+        return (
+            <div className="subjects-container">
+                <div className="loading">Cargando asignaturas...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="subjects-container">
+                <div className="error-message">{error}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="subjects-container">
-            <header className="subjects-header">
-                <div className="header-content">
-                    <h1>ACAInfo - Asignaturas</h1>
-                    <div className="header-actions">
-                        <span className="user-name">Hola, {user?.name}</span>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <nav className="subjects-nav">
-                <ul>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/dashboard')} className="nav-link">
-                            Inicio
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="nav-link active">Asignaturas</a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/enrollments')} className="nav-link">
-                            Mis Inscripciones
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/profile')} className="nav-link">
-                            Mi Perfil
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <main className="subjects-main">
-                <div className="subjects-header-section">
-                    <h2>Asignaturas de {user?.major}</h2>
-                    <div className="year-filter">
-                        <label>Filtrar por año:</label>
-                        <select
-                            value={selectedYear}
-                            onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
-                        >
-                            <option value="all">Todos los años</option>
-                            {uniqueYears.map(year => (
-                                <option key={year} value={year}>Año {year}</option>
-                            ))}
-                        </select>
-                    </div>
+            <div className="subjects-content">
+                <div className="page-header">
+                    <h2>Asignaturas Disponibles</h2>
+                    <p className="page-description">
+                        Explora las asignaturas de tu carrera y sus grupos disponibles
+                    </p>
                 </div>
 
-                {loading ? (
-                    <div className="loading">Cargando asignaturas...</div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : (
-                    <div className="subjects-grid">
-                        {filteredSubjects.map(subject => (
+                {/* Filtro por año */}
+                <div className="year-filter">
+                    <label>Filtrar por año:</label>
+                    <select
+                        value={selectedYear}
+                        onChange={(e) => setSelectedYear(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                        className="year-select"
+                    >
+                        <option value="all">Todos los años</option>
+                        {availableYears.map(year => (
+                            <option key={year} value={year}>
+                                {year}º año
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                {/* Lista de asignaturas */}
+                <div className="subjects-grid">
+                    {filteredSubjects.length === 0 ? (
+                        <div className="no-subjects">
+                            No hay asignaturas disponibles para mostrar.
+                        </div>
+                    ) : (
+                        filteredSubjects.map(subject => (
                             <div
                                 key={subject.id}
                                 className={`subject-card ${selectedSubject?.id === subject.id ? 'selected' : ''}`}
                                 onClick={() => fetchSubjectGroups(subject)}
                             >
                                 <h3>{subject.name}</h3>
-                                <p className="subject-year">Año {subject.courseYear}</p>
+                                <div className="subject-info">
+                                    <span className="subject-year">{subject.courseYear}º año</span>
+                                    <span className="subject-major">{subject.major}</span>
+                                </div>
                                 <button className="view-groups-btn">
-                                    Ver grupos disponibles
+                                    Ver Grupos Disponibles
                                 </button>
                             </div>
-                        ))}
-                    </div>
-                )}
+                        ))
+                    )}
+                </div>
 
+                {/* Grupos de la asignatura seleccionada */}
                 {selectedSubject && (
                     <div className="groups-section">
                         <h3>Grupos disponibles para: {selectedSubject.name}</h3>
 
                         {enrollmentStatus && (
-                            <div className={`enrollment-status ${enrollmentStatus.includes('exitosa') ? 'success' : 'error'}`}>
+                            <div className={`enrollment-status ${enrollmentStatus.includes('Error') ? 'error' : 'success'}`}>
                                 {enrollmentStatus}
                             </div>
                         )}
 
                         {loadingGroups ? (
-                            <div className="loading">Cargando grupos...</div>
+                            <div className="loading-groups">Cargando grupos...</div>
                         ) : subjectGroups.length === 0 ? (
                             <div className="no-groups">
-                                <p>No hay grupos disponibles para esta asignatura.</p>
-                                <button
-                                    className="request-group-btn"
-                                    onClick={() => navigate('/student/group-requests')}
-                                >
-                                    Solicitar apertura de grupo
-                                </button>
+                                No hay grupos disponibles para esta asignatura.
                             </div>
                         ) : (
                             <div className="groups-grid">
                                 {subjectGroups.map(group => (
                                     <div key={group.id} className="group-card">
                                         <div className="group-header">
-                                            <h4>{group.type === 'REGULAR' ? 'Grupo Regular' : 'Grupo Intensivo'}</h4>
+                                            <h4>Grupo {group.id}</h4>
                                             <span className={`group-status ${group.status.toLowerCase()}`}>
-                        {group.status === 'ACTIVE' ? 'Activo' :
-                            group.status === 'PLANNED' ? 'Planificado' : 'Cerrado'}
-                      </span>
+                                                {group.status === 'ACTIVE' ? 'Activo' :
+                                                    group.status === 'PLANNED' ? 'Planificado' : 'Cerrado'}
+                                            </span>
                                         </div>
 
-                                        <div className="group-info">
+                                        <div className="group-details">
                                             <p><strong>Profesor:</strong> {group.teacherName}</p>
+                                            <p><strong>Tipo:</strong> {group.type === 'REGULAR' ? 'Regular' : 'Intensivo'}</p>
                                             <p><strong>Precio:</strong> ${group.price}</p>
-                                            <p><strong>Capacidad:</strong> {group.enrolledStudents}/{group.maxCapacity}</p>
+                                            <p><strong>Cupos:</strong> {group.enrolledStudents}/{group.maxCapacity}</p>
                                         </div>
 
+                                        {/* Horarios si están disponibles */}
                                         {group.sessions && group.sessions.length > 0 && (
                                             <div className="group-schedule">
-                                                <p><strong>Horario:</strong></p>
-                                                {group.sessions.map((session, idx) => (
-                                                    <p key={idx} className="session-info">
-                                                        {getDayName(session.dayOfWeek)} {session.startTime} - {session.endTime}
-                                                        {session.classroom && ` (${session.classroom})`}
-                                                    </p>
+                                                <strong>Horario:</strong>
+                                                {group.sessions.map((session, index) => (
+                                                    <div key={index} className="session-info">
+                                                        {session.dayOfWeek}: {session.startTime} - {session.endTime}
+                                                        <span className="classroom"> ({session.classroom})</span>
+                                                    </div>
                                                 ))}
                                             </div>
                                         )}
 
                                         <button
-                                            className="enroll-btn"
+                                            className="enroll-button"
+                                            onClick={() => handleEnrollment(group.id)}
                                             disabled={
                                                 group.status !== 'ACTIVE' ||
                                                 group.enrolledStudents >= group.maxCapacity
                                             }
-                                            onClick={() => handleEnrollment(group.id)}
                                         >
                                             {group.status !== 'ACTIVE' ? 'No disponible' :
                                                 group.enrolledStudents >= group.maxCapacity ? 'Grupo lleno' :
@@ -242,7 +214,7 @@ export const Subjects: React.FC = () => {
                         )}
                     </div>
                 )}
-            </main>
+            </div>
         </div>
     );
 };

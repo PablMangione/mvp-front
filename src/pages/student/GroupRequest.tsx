@@ -1,14 +1,14 @@
+// src/pages/student/GroupRequest.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { studentApi } from '../../api/student.api';
+import {groupRequestService, subjectService} from '../../services/student';
 import type { GroupRequest, Subject } from '../../types/student.types';
 import './GroupRequest.css';
 
+/**
+ * Página de solicitudes de grupo - REFACTORIZADA
+ * Removido: header, nav y logout (ahora en StudentLayout)
+ */
 export const GroupRequests: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
     const [requests, setRequests] = useState<GroupRequest[]>([]);
     const [subjects, setSubjects] = useState<Subject[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,8 +33,8 @@ export const GroupRequests: React.FC = () => {
             setLoading(true);
             // Cargar solicitudes y asignaturas en paralelo
             const [requestsData, subjectsData] = await Promise.all([
-                studentApi.getMyGroupRequests(),
-                studentApi.getMySubjects()
+                groupRequestService.getMyGroupRequests(),
+                subjectService.getMySubjects()
             ]);
 
             setRequests(requestsData);
@@ -74,41 +74,44 @@ export const GroupRequests: React.FC = () => {
         return Object.keys(errors).length === 0;
     };
 
-    const handleSubmitRequest = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!validateForm()) return;
+        if (!validateForm()) {
+            return;
+        }
 
         try {
             setRequestStatus('Enviando solicitud...');
-            const response = await studentApi.createGroupRequest({
-                subjectId: parseInt(newRequest.subjectId),
+
+            // Verificar si puede solicitar
+            const canRequest = await groupRequestService.canRequestGroup(Number(newRequest.subjectId));
+
+            if (!canRequest) {
+                setRequestStatus('Ya tienes una solicitud pendiente para esta asignatura');
+                setTimeout(() => setRequestStatus(null), 5000);
+                return;
+            }
+
+            // Crear la solicitud
+            await groupRequestService.createGroupRequest({
+                subjectId: Number(newRequest.subjectId),
                 comments: newRequest.comments || undefined
             });
 
-            if (response.success) {
-                setRequestStatus('Solicitud enviada exitosamente');
-                setIsCreatingRequest(false);
-                setNewRequest({ subjectId: '', comments: '' });
+            setRequestStatus('¡Solicitud enviada exitosamente!');
+            setIsCreatingRequest(false);
+            setNewRequest({ subjectId: '', comments: '' });
 
-                // Recargar las solicitudes
-                await fetchData();
+            // Recargar solicitudes
+            await fetchData();
 
-                setTimeout(() => setRequestStatus(null), 3000);
-            } else {
-                setRequestStatus(response.message || 'Error al enviar la solicitud');
-                setTimeout(() => setRequestStatus(null), 5000);
-            }
+            setTimeout(() => setRequestStatus(null), 3000);
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Error al enviar la solicitud';
             setRequestStatus(errorMessage);
             setTimeout(() => setRequestStatus(null), 5000);
         }
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/login');
     };
 
     const getStatusBadge = (status: string) => {
@@ -129,108 +132,50 @@ export const GroupRequests: React.FC = () => {
         return date.toLocaleDateString('es-ES', {
             year: 'numeric',
             month: 'long',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
+            day: 'numeric'
         });
     };
 
     // Filtrar asignaturas que no tienen solicitud pendiente
-    const getAvailableSubjects = () => {
-        const requestedSubjectIds = requests
-            .filter(r => r.status === 'PENDING')
-            .map(r => r.subjectId);
+    const availableSubjects = subjects.filter(subject =>
+        !requests.some(request =>
+            request.subjectId === subject.id &&
+            request.status === 'PENDING'
+        )
+    );
 
-        return subjects.filter(s => !requestedSubjectIds.includes(s.id));
-    };
+    if (loading) {
+        return (
+            <div className="group-requests-container">
+                <div className="loading">Cargando solicitudes...</div>
+            </div>
+        );
+    }
 
-    // Estadísticas
-    const stats = {
-        total: requests.length,
-        pending: requests.filter(r => r.status === 'PENDING').length,
-        approved: requests.filter(r => r.status === 'APPROVED').length,
-        rejected: requests.filter(r => r.status === 'REJECTED').length
-    };
+    if (error) {
+        return (
+            <div className="group-requests-container">
+                <div className="error-message">{error}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="group-requests-container">
-            <header className="group-requests-header">
-                <div className="header-content">
-                    <h1>ACAInfo - Solicitudes de Grupo</h1>
-                    <div className="header-actions">
-                        <span className="user-name">Hola, {user?.name}</span>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <nav className="group-requests-nav">
-                <ul>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/dashboard')} className="nav-link">
-                            Inicio
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/subjects')} className="nav-link">
-                            Asignaturas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/enrollments')} className="nav-link">
-                            Mis Inscripciones
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/profile')} className="nav-link">
-                            Mi Perfil
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="nav-link active">Solicitudes de Grupo</a>
-                    </li>
-                </ul>
-            </nav>
-
-            <main className="group-requests-main">
-                <div className="requests-header-section">
-                    <h2>Solicitudes de Creación de Grupo</h2>
-                    {!isCreatingRequest && getAvailableSubjects().length > 0 && (
-                        <button
-                            className="new-request-btn"
-                            onClick={() => setIsCreatingRequest(true)}
-                        >
-                            Nueva Solicitud
-                        </button>
-                    )}
+            <div className="group-requests-content">
+                <div className="page-header">
+                    <h2>Solicitudes de Grupo</h2>
+                    <button
+                        className="new-request-btn"
+                        onClick={() => setIsCreatingRequest(!isCreatingRequest)}
+                    >
+                        {isCreatingRequest ? 'Cancelar' : 'Nueva Solicitud'}
+                    </button>
                 </div>
 
-                {/* Estadísticas */}
-                {requests.length > 0 && (
-                    <div className="request-stats">
-                        <div className="stat-card">
-                            <h3>{stats.total}</h3>
-                            <p>Total Solicitudes</p>
-                        </div>
-                        <div className="stat-card">
-                            <h3>{stats.pending}</h3>
-                            <p>Pendientes</p>
-                        </div>
-                        <div className="stat-card">
-                            <h3>{stats.approved}</h3>
-                            <p>Aprobadas</p>
-                        </div>
-                        <div className="stat-card">
-                            <h3>{stats.rejected}</h3>
-                            <p>Rechazadas</p>
-                        </div>
-                    </div>
-                )}
-
+                {/* Mensaje de estado */}
                 {requestStatus && (
-                    <div className={`request-status ${requestStatus.includes('exitosamente') ? 'success' : 'error'}`}>
+                    <div className={`request-status ${requestStatus.includes('Error') || requestStatus.includes('Ya tienes') ? 'error' : 'success'}`}>
                         {requestStatus}
                     </div>
                 )}
@@ -238,8 +183,8 @@ export const GroupRequests: React.FC = () => {
                 {/* Formulario de nueva solicitud */}
                 {isCreatingRequest && (
                     <div className="new-request-form-container">
-                        <h3>Nueva Solicitud de Grupo</h3>
-                        <form onSubmit={handleSubmitRequest} className="new-request-form">
+                        <h3>Crear Nueva Solicitud</h3>
+                        <form onSubmit={handleSubmit} className="new-request-form">
                             <div className="form-group">
                                 <label htmlFor="subjectId">Asignatura *</label>
                                 <select
@@ -248,25 +193,22 @@ export const GroupRequests: React.FC = () => {
                                     value={newRequest.subjectId}
                                     onChange={handleInputChange}
                                     className={formErrors.subjectId ? 'error' : ''}
+                                    required
                                 >
                                     <option value="">Selecciona una asignatura</option>
-                                    {getAvailableSubjects().map(subject => (
+                                    {availableSubjects.map(subject => (
                                         <option key={subject.id} value={subject.id}>
-                                            {subject.name} - Año {subject.courseYear}
+                                            {subject.name} - {subject.courseYear}º año
                                         </option>
                                     ))}
                                 </select>
-                                {formErrors.subjectId && (
-                                    <span className="field-error">{formErrors.subjectId}</span>
-                                )}
+                                {formErrors.subjectId && <span className="error-text">{formErrors.subjectId}</span>}
                             </div>
 
                             <div className="form-group">
                                 <label htmlFor="comments">
                                     Comentarios (opcional)
-                                    <span className="field-hint">
-                                        Puedes indicar preferencias de horario, profesor, etc.
-                                    </span>
+                                    <small>Explica por qué necesitas un nuevo grupo</small>
                                 </label>
                                 <textarea
                                     id="comments"
@@ -274,7 +216,7 @@ export const GroupRequests: React.FC = () => {
                                     value={newRequest.comments}
                                     onChange={handleInputChange}
                                     rows={4}
-                                    placeholder="Ej: Prefiero horario vespertino, necesito grupo intensivo..."
+                                    placeholder="Ej: Conflicto de horario con otra asignatura, necesito un grupo en horario vespertino..."
                                 />
                             </div>
 
@@ -298,81 +240,54 @@ export const GroupRequests: React.FC = () => {
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="loading">Cargando solicitudes...</div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : requests.length === 0 && !isCreatingRequest ? (
+                {/* Lista de solicitudes */}
+                {requests.length === 0 ? (
                     <div className="no-requests">
-                        <h3>No tienes solicitudes registradas</h3>
-                        <p>
-                            Cuando una asignatura no tiene grupos disponibles,
-                            puedes solicitar que se abra uno nuevo.
-                        </p>
-                        {getAvailableSubjects().length > 0 ? (
+                        <h3>No tienes solicitudes de grupo</h3>
+                        <p>Puedes solicitar la creación de nuevos grupos para asignaturas que lo necesiten.</p>
+                        {!isCreatingRequest && (
                             <button
                                 className="create-first-btn"
                                 onClick={() => setIsCreatingRequest(true)}
                             >
                                 Crear Primera Solicitud
                             </button>
-                        ) : (
-                            <p className="info-message">
-                                Ya tienes solicitudes pendientes para todas las asignaturas disponibles.
-                            </p>
                         )}
                     </div>
                 ) : (
-                    <div className="requests-grid">
+                    <div className="requests-list">
+                        <h3>Mis Solicitudes ({requests.length})</h3>
                         {requests.map(request => (
                             <div key={request.id} className="request-card">
                                 <div className="request-header">
-                                    <h3>{request.subjectName}</h3>
+                                    <h4>{request.subjectName}</h4>
                                     {getStatusBadge(request.status)}
                                 </div>
 
                                 <div className="request-info">
-                                    <div className="info-row">
-                                        <span className="label">Fecha de solicitud:</span>
-                                        <span className="value">{formatDate(request.createdAt)}</span>
-                                    </div>
+                                    <p className="request-date">
+                                        Solicitado el {formatDate(request.createdAt)}
+                                    </p>
 
                                     {request.comments && (
-                                        <div className="comments-section">
-                                            <span className="label">Tus comentarios:</span>
-                                            <p className="comments-text">{request.comments}</p>
+                                        <div className="request-comments">
+                                            <strong>Tus comentarios:</strong>
+                                            <p>{request.comments}</p>
                                         </div>
                                     )}
 
                                     {request.adminComments && (
-                                        <div className="admin-comments-section">
-                                            <span className="label">Respuesta del administrador:</span>
-                                            <p className="admin-comments-text">{request.adminComments}</p>
+                                        <div className="admin-comments">
+                                            <strong>Respuesta del administrador:</strong>
+                                            <p>{request.adminComments}</p>
                                         </div>
                                     )}
                                 </div>
-
-                                {request.status === 'APPROVED' && (
-                                    <div className="request-actions">
-                                        <button
-                                            className="view-groups-btn"
-                                            onClick={() => navigate('/student/subjects')}
-                                        >
-                                            Ver Grupos Disponibles
-                                        </button>
-                                    </div>
-                                )}
-
-                                {request.status === 'PENDING' && (
-                                    <div className="pending-info">
-                                        <p>Tu solicitud está siendo revisada por el administrador.</p>
-                                    </div>
-                                )}
                             </div>
                         ))}
                     </div>
                 )}
-            </main>
+            </div>
         </div>
     );
 };

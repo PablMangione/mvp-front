@@ -1,12 +1,14 @@
+// src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { StudentLayout } from './components/student/StudentLayout';
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
 import { StudentDashboard } from './pages/student/Dashboard';
-import {Profile} from "./pages/student/Profile";
-import { Enrollments } from './pages/student/Enrollment'
+import { Profile } from './pages/student/Profile';
+import { Enrollments } from './pages/student/Enrollment';
 import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
 import './App.css';
@@ -23,13 +25,16 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-                    {/* Rutas protegidas para estudiantes */}
+                    {/* Rutas protegidas para estudiantes - REFACTORIZADO */}
                     <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
-                        <Route path="/student/dashboard" element={<StudentDashboard />} />
-                        <Route path="/student/subjects" element={<Subjects />} />
-                        { <Route path="/student/profile" element={<Profile />} /> }
-                        { <Route path="/student/enrollments" element={<Enrollments />} /> }
-                        { <Route path="/student/group-requests" element={<GroupRequests />} /> }
+                        {/* StudentLayout envuelve todas las rutas del estudiante */}
+                        <Route element={<StudentLayout />}>
+                            <Route path="/student/dashboard" element={<StudentDashboard />} />
+                            <Route path="/student/subjects" element={<Subjects />} />
+                            <Route path="/student/profile" element={<Profile />} />
+                            <Route path="/student/enrollments" element={<Enrollments />} />
+                            <Route path="/student/group-requests" element={<GroupRequests />} />
+                        </Route>
                     </Route>
 
                     {/* Rutas protegidas para profesores */}
@@ -41,23 +46,6 @@ function App() {
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                         {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
                     </Route>
-
-                    {/* Ruta para acceso no autorizado */}
-                    <Route path="/unauthorized" element={
-                        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                            <h1>Acceso No Autorizado</h1>
-                            <p>No tienes permisos para acceder a esta página.</p>
-                            <a href="/">Volver al inicio</a>
-                        </div>
-                    } />
-
-                    {/* Ruta 404 */}
-                    <Route path="*" element={
-                        <div style={{ textAlign: 'center', marginTop: '50px' }}>
-                            <h1>404 - Página no encontrada</h1>
-                            <a href="/">Volver al inicio</a>
-                        </div>
-                    } />
                 </Routes>
             </AuthProvider>
         </Router>

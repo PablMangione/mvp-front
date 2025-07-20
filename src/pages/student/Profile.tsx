@@ -1,14 +1,14 @@
+// src/pages/student/Profile.tsx
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { studentApi } from '../../api/student.api';
+import {studentService} from '../../services/student';
 import type { StudentProfile } from '../../types/student.types';
 import './Profile.css';
 
+/**
+ * Página de perfil del estudiante - REFACTORIZADA
+ * Removido: header, nav y logout (ahora en StudentLayout)
+ */
 export const Profile: React.FC = () => {
-    const { user, logout } = useAuth();
-    const navigate = useNavigate();
-
     const [profile, setProfile] = useState<StudentProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -38,7 +38,7 @@ export const Profile: React.FC = () => {
     const fetchProfile = async () => {
         try {
             setLoading(true);
-            const data = await studentApi.getProfile();
+            const data = await studentService.getProfile();
             setProfile(data);
             setEditData({
                 name: data.name,
@@ -64,7 +64,7 @@ export const Profile: React.FC = () => {
         setIsEditing(!isEditing);
     };
 
-    const handleEditChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setEditData(prev => ({
             ...prev,
@@ -87,7 +87,6 @@ export const Profile: React.FC = () => {
             [name]: value
         }));
 
-        // Limpiar error del campo
         if (formErrors[name]) {
             setFormErrors(prev => ({
                 ...prev,
@@ -96,14 +95,14 @@ export const Profile: React.FC = () => {
         }
     };
 
-    const validateEditForm = (): boolean => {
+    const validateProfileForm = (): boolean => {
         const errors: Record<string, string> = {};
 
         if (!editData.name.trim()) {
             errors.name = 'El nombre es requerido';
         }
 
-        if (!editData.major) {
+        if (!editData.major.trim()) {
             errors.major = 'La carrera es requerida';
         }
 
@@ -125,7 +124,7 @@ export const Profile: React.FC = () => {
         }
 
         if (!passwordData.confirmPassword) {
-            errors.confirmPassword = 'Debes confirmar la contraseña';
+            errors.confirmPassword = 'Debes confirmar la nueva contraseña';
         } else if (passwordData.newPassword !== passwordData.confirmPassword) {
             errors.confirmPassword = 'Las contraseñas no coinciden';
         }
@@ -134,12 +133,15 @@ export const Profile: React.FC = () => {
         return Object.keys(errors).length === 0;
     };
 
-    const handleUpdateProfile = async () => {
-        if (!validateEditForm()) return;
+    const handleProfileUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validateProfileForm()) {
+            return;
+        }
 
         try {
-            setUpdateStatus('Actualizando perfil...');
-            const updatedProfile = await studentApi.updateProfile(editData);
+            const updatedProfile = await studentService.updateProfile(editData);
             setProfile(updatedProfile);
             setIsEditing(false);
             setUpdateStatus('Perfil actualizado exitosamente');
@@ -147,279 +149,211 @@ export const Profile: React.FC = () => {
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Error al actualizar el perfil';
             setUpdateStatus(errorMessage);
-            setTimeout(() => setUpdateStatus(null), 5000);
         }
     };
 
-    const handleChangePassword = async () => {
-        if (!validatePasswordForm()) return;
+    const handlePasswordUpdate = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!validatePasswordForm()) {
+            return;
+        }
 
         try {
-            setUpdateStatus('Cambiando contraseña...');
-            await studentApi.changePassword(passwordData);
+            await studentService.changePassword(passwordData);
+            setIsChangingPassword(false);
             setPasswordData({
                 currentPassword: '',
                 newPassword: '',
                 confirmPassword: ''
             });
-            setIsChangingPassword(false);
             setUpdateStatus('Contraseña cambiada exitosamente');
             setTimeout(() => setUpdateStatus(null), 3000);
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Error al cambiar la contraseña';
-            setUpdateStatus(errorMessage);
-            setTimeout(() => setUpdateStatus(null), 5000);
+            setFormErrors({ currentPassword: errorMessage });
         }
     };
 
-    const handleLogout = async () => {
-        await logout();
-        navigate('/login');
-    };
+    if (loading) {
+        return (
+            <div className="profile-container">
+                <div className="loading">Cargando perfil...</div>
+            </div>
+        );
+    }
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('es-ES', {
-            year: 'numeric',
-            month: 'long',
-            day: 'numeric'
-        });
-    };
+    if (error) {
+        return (
+            <div className="profile-container">
+                <div className="error-message">{error}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="profile-container">
-            <header className="profile-header">
-                <div className="header-content">
-                    <h1>ACAInfo - Mi Perfil</h1>
-                    <div className="header-actions">
-                        <span className="user-name">Hola, {user?.name}</span>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
+            <div className="profile-content">
+                <h2>Mi Perfil</h2>
 
-            <nav className="profile-nav">
-                <ul>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/dashboard')} className="nav-link">
-                            Inicio
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/subjects')} className="nav-link">
-                            Asignaturas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/enrollments')} className="nav-link">
-                            Mis Inscripciones
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="nav-link active">Mi Perfil</a>
-                    </li>
-                </ul>
-            </nav>
-
-            <main className="profile-main">
                 {updateStatus && (
-                    <div className={`update-status ${updateStatus.includes('exitosamente') ? 'success' : 'error'}`}>
+                    <div className={`status-message ${updateStatus.includes('Error') ? 'error' : 'success'}`}>
                         {updateStatus}
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="loading">Cargando perfil...</div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : profile && (
-                    <div className="profile-content">
-                        <div className="profile-card">
-                            <div className="profile-header-section">
-                                <h2>Información Personal</h2>
-                                {!isChangingPassword && (
-                                    <button
-                                        className={`edit-btn ${isEditing ? 'cancel' : ''}`}
-                                        onClick={handleEditToggle}
-                                    >
-                                        {isEditing ? 'Cancelar' : 'Editar'}
-                                    </button>
-                                )}
+                {/* Información del perfil */}
+                <div className="profile-section">
+                    <h3>Información Personal</h3>
+
+                    {!isEditing ? (
+                        <div className="profile-info">
+                            <div className="info-row">
+                                <label>Nombre:</label>
+                                <span>{profile?.name}</span>
+                            </div>
+                            <div className="info-row">
+                                <label>Email:</label>
+                                <span>{profile?.email}</span>
+                            </div>
+                            <div className="info-row">
+                                <label>Carrera:</label>
+                                <span>{profile?.major}</span>
+                            </div>
+                            <div className="info-row">
+                                <label>Miembro desde:</label>
+                                <span>{profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : 'N/A'}</span>
                             </div>
 
-                            <div className="profile-info">
-                                <div className="info-group">
-                                    <label>Nombre completo</label>
-                                    {isEditing ? (
-                                        <>
-                                            <input
-                                                type="text"
-                                                name="name"
-                                                value={editData.name}
-                                                onChange={handleEditChange}
-                                                className={formErrors.name ? 'error' : ''}
-                                            />
-                                            {formErrors.name && (
-                                                <span className="field-error">{formErrors.name}</span>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <p>{profile.name}</p>
-                                    )}
-                                </div>
-
-                                <div className="info-group">
-                                    <label>Email institucional</label>
-                                    <p>{profile.email}</p>
-                                    <span className="info-note">El email no se puede cambiar</span>
-                                </div>
-
-                                <div className="info-group">
-                                    <label>Carrera</label>
-                                    {isEditing ? (
-                                        <>
-                                            <select
-                                                name="major"
-                                                value={editData.major}
-                                                onChange={handleEditChange}
-                                                className={formErrors.major ? 'error' : ''}
-                                            >
-                                                <option value="">Selecciona tu carrera</option>
-                                                <option value="Ingeniería en Sistemas">Ingeniería en Sistemas</option>
-                                                <option value="Ingeniería Civil">Ingeniería Civil</option>
-                                                <option value="Administración de Empresas">Administración de Empresas</option>
-                                                <option value="Psicología">Psicología</option>
-                                            </select>
-                                            {formErrors.major && (
-                                                <span className="field-error">{formErrors.major}</span>
-                                            )}
-                                        </>
-                                    ) : (
-                                        <p>{profile.major}</p>
-                                    )}
-                                </div>
-
-                                <div className="info-group">
-                                    <label>Miembro desde</label>
-                                    <p>{formatDate(profile.createdAt)}</p>
-                                </div>
-
-                                {profile.updatedAt && (
-                                    <div className="info-group">
-                                        <label>Última actualización</label>
-                                        <p>{formatDate(profile.updatedAt)}</p>
-                                    </div>
-                                )}
-                            </div>
-
-                            {isEditing && (
-                                <div className="profile-actions">
-                                    <button
-                                        className="save-btn"
-                                        onClick={handleUpdateProfile}
-                                    >
-                                        Guardar Cambios
-                                    </button>
-                                    <button
-                                        className="cancel-btn"
-                                        onClick={handleEditToggle}
-                                    >
-                                        Cancelar
-                                    </button>
-                                </div>
-                            )}
+                            <button className="edit-button" onClick={handleEditToggle}>
+                                Editar Información
+                            </button>
                         </div>
-
-                        <div className="profile-card">
-                            <div className="profile-header-section">
-                                <h2>Seguridad</h2>
+                    ) : (
+                        <form onSubmit={handleProfileUpdate} className="profile-form">
+                            <div className="form-group">
+                                <label htmlFor="name">Nombre</label>
+                                <input
+                                    type="text"
+                                    id="name"
+                                    name="name"
+                                    value={editData.name}
+                                    onChange={handleInputChange}
+                                    className={formErrors.name ? 'error' : ''}
+                                />
+                                {formErrors.name && <span className="error-text">{formErrors.name}</span>}
                             </div>
 
-                            {!isChangingPassword ? (
-                                <div className="security-info">
-                                    <p>Mantén tu cuenta segura actualizando tu contraseña regularmente.</p>
-                                    <button
-                                        className="change-password-btn"
-                                        onClick={() => setIsChangingPassword(true)}
-                                    >
-                                        Cambiar Contraseña
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="password-form">
-                                    <div className="info-group">
-                                        <label>Contraseña actual</label>
-                                        <input
-                                            type="password"
-                                            name="currentPassword"
-                                            value={passwordData.currentPassword}
-                                            onChange={handlePasswordChange}
-                                            className={formErrors.currentPassword ? 'error' : ''}
-                                        />
-                                        {formErrors.currentPassword && (
-                                            <span className="field-error">{formErrors.currentPassword}</span>
-                                        )}
-                                    </div>
+                            <div className="form-group">
+                                <label htmlFor="email">Email</label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    value={profile?.email}
+                                    disabled
+                                    className="disabled"
+                                />
+                                <small>El email no se puede cambiar</small>
+                            </div>
 
-                                    <div className="info-group">
-                                        <label>Nueva contraseña</label>
-                                        <input
-                                            type="password"
-                                            name="newPassword"
-                                            value={passwordData.newPassword}
-                                            onChange={handlePasswordChange}
-                                            placeholder="Mínimo 8 caracteres"
-                                            className={formErrors.newPassword ? 'error' : ''}
-                                        />
-                                        {formErrors.newPassword && (
-                                            <span className="field-error">{formErrors.newPassword}</span>
-                                        )}
-                                    </div>
+                            <div className="form-group">
+                                <label htmlFor="major">Carrera</label>
+                                <input
+                                    type="text"
+                                    id="major"
+                                    name="major"
+                                    value={editData.major}
+                                    onChange={handleInputChange}
+                                    className={formErrors.major ? 'error' : ''}
+                                />
+                                {formErrors.major && <span className="error-text">{formErrors.major}</span>}
+                            </div>
 
-                                    <div className="info-group">
-                                        <label>Confirmar nueva contraseña</label>
-                                        <input
-                                            type="password"
-                                            name="confirmPassword"
-                                            value={passwordData.confirmPassword}
-                                            onChange={handlePasswordChange}
-                                            className={formErrors.confirmPassword ? 'error' : ''}
-                                        />
-                                        {formErrors.confirmPassword && (
-                                            <span className="field-error">{formErrors.confirmPassword}</span>
-                                        )}
-                                    </div>
+                            <div className="form-actions">
+                                <button type="submit" className="save-button">
+                                    Guardar Cambios
+                                </button>
+                                <button type="button" className="cancel-button" onClick={handleEditToggle}>
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
 
-                                    <div className="profile-actions">
-                                        <button
-                                            className="save-btn"
-                                            onClick={handleChangePassword}
-                                        >
-                                            Cambiar Contraseña
-                                        </button>
-                                        <button
-                                            className="cancel-btn"
-                                            onClick={() => {
-                                                setIsChangingPassword(false);
-                                                setPasswordData({
-                                                    currentPassword: '',
-                                                    newPassword: '',
-                                                    confirmPassword: ''
-                                                });
-                                                setFormErrors({});
-                                            }}
-                                        >
-                                            Cancelar
-                                        </button>
-                                    </div>
-                                </div>
-                            )}
-                        </div>
-                    </div>
-                )}
-            </main>
+                {/* Cambiar contraseña */}
+                <div className="profile-section">
+                    <h3>Seguridad</h3>
+
+                    {!isChangingPassword ? (
+                        <button className="change-password-button" onClick={() => setIsChangingPassword(true)}>
+                            Cambiar Contraseña
+                        </button>
+                    ) : (
+                        <form onSubmit={handlePasswordUpdate} className="password-form">
+                            <div className="form-group">
+                                <label htmlFor="currentPassword">Contraseña Actual</label>
+                                <input
+                                    type="password"
+                                    id="currentPassword"
+                                    name="currentPassword"
+                                    value={passwordData.currentPassword}
+                                    onChange={handlePasswordChange}
+                                    className={formErrors.currentPassword ? 'error' : ''}
+                                />
+                                {formErrors.currentPassword && <span className="error-text">{formErrors.currentPassword}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="newPassword">Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    id="newPassword"
+                                    name="newPassword"
+                                    value={passwordData.newPassword}
+                                    onChange={handlePasswordChange}
+                                    className={formErrors.newPassword ? 'error' : ''}
+                                />
+                                {formErrors.newPassword && <span className="error-text">{formErrors.newPassword}</span>}
+                            </div>
+
+                            <div className="form-group">
+                                <label htmlFor="confirmPassword">Confirmar Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    value={passwordData.confirmPassword}
+                                    onChange={handlePasswordChange}
+                                    className={formErrors.confirmPassword ? 'error' : ''}
+                                />
+                                {formErrors.confirmPassword && <span className="error-text">{formErrors.confirmPassword}</span>}
+                            </div>
+
+                            <div className="form-actions">
+                                <button type="submit" className="save-button">
+                                    Cambiar Contraseña
+                                </button>
+                                <button
+                                    type="button"
+                                    className="cancel-button"
+                                    onClick={() => {
+                                        setIsChangingPassword(false);
+                                        setPasswordData({
+                                            currentPassword: '',
+                                            newPassword: '',
+                                            confirmPassword: ''
+                                        });
+                                        setFormErrors({});
+                                    }}
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </form>
+                    )}
+                </div>
+            </div>
         </div>
     );
 };

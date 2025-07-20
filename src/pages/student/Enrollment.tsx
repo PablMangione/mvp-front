@@ -1,14 +1,16 @@
+// src/pages/student/Enrollment.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../hooks/useAuth';
-import { studentApi } from '../../api/student.api';
+import { enrollmentService } from '../../services/student';
 import type { EnrollmentSummary } from '../../types/student.types';
 import './Enrollment.css';
 
+/**
+ * Página de inscripciones - REFACTORIZADA
+ * Removido: header, nav y logout (ahora en StudentLayout)
+ */
 export const Enrollments: React.FC = () => {
-    const { user, logout } = useAuth();
     const navigate = useNavigate();
-
     const [enrollments, setEnrollments] = useState<EnrollmentSummary[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -21,7 +23,7 @@ export const Enrollments: React.FC = () => {
     const fetchEnrollments = async () => {
         try {
             setLoading(true);
-            const data = await studentApi.getMyEnrollments();
+            const data = await enrollmentService.getMyEnrollments();
             setEnrollments(data);
         } catch (error) {
             console.error('Error fetching enrollments:', error);
@@ -38,7 +40,7 @@ export const Enrollments: React.FC = () => {
 
         try {
             setCancelStatus('Cancelando inscripción...');
-            await studentApi.cancelEnrollment(enrollmentId);
+            await enrollmentService.cancelEnrollment(enrollmentId);
             setCancelStatus('Inscripción cancelada exitosamente');
 
             // Recargar las inscripciones
@@ -50,11 +52,6 @@ export const Enrollments: React.FC = () => {
             setCancelStatus(errorMessage);
             setTimeout(() => setCancelStatus(null), 5000);
         }
-    };
-
-    const handleLogout = async () => {
-        await logout();
-        navigate('/login');
     };
 
     const getPaymentStatusBadge = (status: string) => {
@@ -93,44 +90,25 @@ export const Enrollments: React.FC = () => {
         failed: enrollments.filter(e => e.paymentStatus === 'FAILED').length
     };
 
+    if (loading) {
+        return (
+            <div className="enrollments-container">
+                <div className="loading">Cargando inscripciones...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="enrollments-container">
+                <div className="error-message">{error}</div>
+            </div>
+        );
+    }
+
     return (
         <div className="enrollments-container">
-            <header className="enrollments-header">
-                <div className="header-content">
-                    <h1>ACAInfo - Mis Inscripciones</h1>
-                    <div className="header-actions">
-                        <span className="user-name">Hola, {user?.name}</span>
-                        <button onClick={handleLogout} className="logout-button">
-                            Cerrar Sesión
-                        </button>
-                    </div>
-                </div>
-            </header>
-
-            <nav className="enrollments-nav">
-                <ul>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/dashboard')} className="nav-link">
-                            Inicio
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/subjects')} className="nav-link">
-                            Asignaturas
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" className="nav-link active">Mis Inscripciones</a>
-                    </li>
-                    <li>
-                        <a href="#" onClick={() => navigate('/student/profile')} className="nav-link">
-                            Mi Perfil
-                        </a>
-                    </li>
-                </ul>
-            </nav>
-
-            <main className="enrollments-main">
+            <div className="enrollments-content">
                 <div className="enrollments-header-section">
                     <h2>Mis Inscripciones</h2>
                     {enrollments.length > 0 && (
@@ -143,7 +121,7 @@ export const Enrollments: React.FC = () => {
                     )}
                 </div>
 
-                {/* Estadísticas */}
+                {/* Estadísticas de inscripciones */}
                 {enrollments.length > 0 && (
                     <div className="enrollment-stats">
                         <div className="stat-card">
@@ -158,24 +136,24 @@ export const Enrollments: React.FC = () => {
                             <h3>{stats.pending}</h3>
                             <p>Pago Pendiente</p>
                         </div>
-                        <div className="stat-card">
-                            <h3>{stats.failed}</h3>
-                            <p>Pago Fallido</p>
-                        </div>
+                        {stats.failed > 0 && (
+                            <div className="stat-card">
+                                <h3>{stats.failed}</h3>
+                                <p>Pago Fallido</p>
+                            </div>
+                        )}
                     </div>
                 )}
 
+                {/* Mensaje de estado */}
                 {cancelStatus && (
-                    <div className={`cancel-status ${cancelStatus.includes('exitosamente') ? 'success' : 'error'}`}>
+                    <div className={`cancel-status ${cancelStatus.includes('Error') ? 'error' : 'success'}`}>
                         {cancelStatus}
                     </div>
                 )}
 
-                {loading ? (
-                    <div className="loading">Cargando inscripciones...</div>
-                ) : error ? (
-                    <div className="error-message">{error}</div>
-                ) : enrollments.length === 0 ? (
+                {/* Lista de inscripciones */}
+                {enrollments.length === 0 ? (
                     <div className="no-enrollments">
                         <h3>No tienes inscripciones activas</h3>
                         <p>Explora las asignaturas disponibles y encuentra grupos para inscribirte.</p>
@@ -202,10 +180,10 @@ export const Enrollments: React.FC = () => {
                                     </div>
                                     <div className="info-row">
                                         <span className="label">Horario:</span>
-                                        <span className="value">{enrollment.schedule || 'Por definir'}</span>
+                                        <span className="value">{enrollment.schedule}</span>
                                     </div>
                                     <div className="info-row">
-                                        <span className="label">Fecha inscripción:</span>
+                                        <span className="label">Fecha de inscripción:</span>
                                         <span className="value">{formatDate(enrollment.enrollmentDate)}</span>
                                     </div>
                                     <div className="info-row">
@@ -216,45 +194,22 @@ export const Enrollments: React.FC = () => {
 
                                 <div className="enrollment-actions">
                                     {enrollment.paymentStatus === 'PENDING' && (
-                                        <>
-                                            <button
-                                                className="pay-btn"
-                                                onClick={() => alert('Sistema de pagos en desarrollo')}
-                                            >
-                                                Realizar Pago
-                                            </button>
-                                            <button
-                                                className="cancel-btn"
-                                                onClick={() => handleCancelEnrollment(enrollment.id)}
-                                            >
-                                                Cancelar Inscripción
-                                            </button>
-                                        </>
-                                    )}
-                                    {enrollment.paymentStatus === 'PAID' && (
-                                        <button
-                                            className="view-details-btn"
-                                            onClick={() => navigate(`/student/groups/${enrollment.groupId}`)}
-                                            disabled
-                                            title="Funcionalidad en desarrollo"
-                                        >
-                                            Ver Detalles del Grupo
+                                        <button className="pay-button">
+                                            Pagar Ahora
                                         </button>
                                     )}
-                                    {enrollment.paymentStatus === 'FAILED' && (
-                                        <button
-                                            className="retry-btn"
-                                            onClick={() => alert('Sistema de pagos en desarrollo')}
-                                        >
-                                            Reintentar Pago
-                                        </button>
-                                    )}
+                                    <button
+                                        className="cancel-button"
+                                        onClick={() => handleCancelEnrollment(enrollment.id)}
+                                    >
+                                        Cancelar Inscripción
+                                    </button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 )}
-            </main>
+            </div>
         </div>
     );
 };
