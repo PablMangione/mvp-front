@@ -54,7 +54,15 @@ export const GroupRequestCard: React.FC<GroupRequestCardProps> = ({
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
+        // Convertir el formato del backend a ISO 8601
+        const isoDate = dateString.replace(' ', 'T');
+        const date = new Date(isoDate);
+
+        // Verificar si la fecha es válida
+        if (isNaN(date.getTime())) {
+            return 'Fecha inválida';
+        }
+        console.log(date)
         const now = new Date();
         const diffTime = Math.abs(now.getTime() - date.getTime());
         const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));

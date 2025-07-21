@@ -27,6 +27,7 @@ export const Enrollments: React.FC = () => {
             setLoading(true);
             const data = await enrollmentService.getMyEnrollments();
             setEnrollments(data);
+            console.log('Enrollments cargados', data);
         } catch (error) {
             console.error('Error fetching enrollments:', error);
             setError('Error al cargar las inscripciones');
@@ -41,6 +42,7 @@ export const Enrollments: React.FC = () => {
         }
 
         try {
+            console.log('Para borrar', enrollmentId);
             setCancellingId(enrollmentId);
             setCancelStatus('Cancelando inscripción...');
             await enrollmentService.cancelEnrollment(enrollmentId);
@@ -93,17 +95,9 @@ export const Enrollments: React.FC = () => {
         <div className="enrollments-container">
             <div className="enrollments-content">
                 <div className="enrollments-header-section">
-                    <h2>Mis Inscripciones</h2>
-                    {enrollments.length > 0 && (
-                        <button
-                            className="explore-subjects-btn"
-                            onClick={() => navigate('/student/subjects')}
-                        >
-                            Explorar más asignaturas
-                        </button>
-                    )}
+                    <h2>Mis Inscripciones
+                    </h2>
                 </div>
-
                 {/* Estadísticas de inscripciones usando StatsCard */}
                 {enrollments.length > 0 && (
                     <div className="stats-card-grid">
@@ -171,11 +165,11 @@ export const Enrollments: React.FC = () => {
                                         .filter(e => e.paymentStatus === 'PENDING')
                                         .map(enrollment => (
                                             <EnrollmentCard
-                                                key={enrollment.id}
+                                                key={enrollment.enrollmentId}
                                                 enrollment={enrollment}
                                                 onCancel={handleCancelEnrollment}
                                                 onPay={handlePayment}
-                                                isProcessing={cancellingId === enrollment.id}
+                                                isProcessing={cancellingId === enrollment.enrollmentId}
                                             />
                                         ))}
                                 </div>
@@ -191,10 +185,10 @@ export const Enrollments: React.FC = () => {
                                         .filter(e => e.paymentStatus === 'PAID')
                                         .map(enrollment => (
                                             <EnrollmentCard
-                                                key={enrollment.id}
+                                                key={enrollment.enrollmentId}
                                                 enrollment={enrollment}
                                                 onCancel={handleCancelEnrollment}
-                                                isProcessing={cancellingId === enrollment.id}
+                                                isProcessing={cancellingId === enrollment.enrollmentId}
                                             />
                                         ))}
                                 </div>
@@ -210,11 +204,11 @@ export const Enrollments: React.FC = () => {
                                         .filter(e => e.paymentStatus === 'FAILED')
                                         .map(enrollment => (
                                             <EnrollmentCard
-                                                key={enrollment.id}
+                                                key={enrollment.enrollmentId}
                                                 enrollment={enrollment}
                                                 onCancel={handleCancelEnrollment}
                                                 onPay={handlePayment}
-                                                isProcessing={cancellingId === enrollment.id}
+                                                isProcessing={cancellingId === enrollment.enrollmentId}
                                             />
                                         ))}
                                 </div>

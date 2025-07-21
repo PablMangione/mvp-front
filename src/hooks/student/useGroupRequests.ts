@@ -52,6 +52,7 @@ export const useGroupRequests = () => {
                 groupRequestService.getMyGroupRequests(),
                 subjectService.getMySubjects()
             ]);
+            console.debug('Solicitudes', requestsData);
 
             setRequests(requestsData);
             setSubjects(subjectsData);

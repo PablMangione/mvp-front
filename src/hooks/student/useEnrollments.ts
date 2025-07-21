@@ -41,6 +41,7 @@ export const useEnrollments = () => {
             setError(null);
             const data = await enrollmentService.getMyEnrollments();
             setEnrollments(data);
+            console.log('Enrollments cargados', data);
         } catch (error) {
             console.error('Error fetching enrollments:', error);
             setError('Error al cargar las inscripciones');
@@ -52,6 +53,7 @@ export const useEnrollments = () => {
     // Cancelar inscripción
     const cancelEnrollment = async (enrollmentId: number) => {
         try {
+            console.log('Canceling enrollment:', enrollmentId);
             setCancelling(enrollmentId);
             setCancelStatus('Cancelando inscripción...');
 
@@ -135,7 +137,7 @@ export const useEnrollments = () => {
         switch (by) {
             case 'date':
                 return sorted.sort((a, b) =>
-                    new Date(b.enrollmentDate).getTime() - new Date(a.enrollmentDate).getTime()
+                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
                 );
             case 'subject':
                 return sorted.sort((a, b) =>

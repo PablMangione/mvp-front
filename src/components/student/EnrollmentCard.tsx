@@ -20,6 +20,7 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
                                                                   onPay,
                                                                   isProcessing = false
                                                               }) => {
+
     const getPaymentStatusInfo = (status: string) => {
         switch (status) {
             case 'PAID':
@@ -40,7 +41,10 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
+
+        const isoDate = dateString.replace(' ', 'T');
+        const date = new Date(isoDate);
+        console.log(date)
         return date.toLocaleDateString('es-ES', {
             year: 'numeric',
             month: 'long',
@@ -80,7 +84,7 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
                 <div className="enrollment-card__info-row">
                     <span className="enrollment-card__label">Inscrito el:</span>
                     <span className="enrollment-card__value">
-                        {formatDate(enrollment.enrollmentDate)}
+                        {formatDate(enrollment.createdAt)}
                     </span>
                 </div>
             </div>
@@ -89,7 +93,7 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
                 {enrollment.paymentStatus === 'PENDING' && onPay && (
                     <button
                         className="enrollment-card__btn enrollment-card__btn--primary"
-                        onClick={() => onPay(enrollment.id)}
+                        onClick={() => onPay(enrollment.enrollmentId)}
                         disabled={isProcessing}
                     >
                         Pagar Ahora
@@ -99,7 +103,7 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
                 {enrollment.paymentStatus === 'FAILED' && onPay && (
                     <button
                         className="enrollment-card__btn enrollment-card__btn--warning"
-                        onClick={() => onPay(enrollment.id)}
+                        onClick={() => onPay(enrollment.enrollmentId)}
                         disabled={isProcessing}
                     >
                         Reintentar Pago
@@ -109,7 +113,7 @@ export const EnrollmentCard: React.FC<EnrollmentCardProps> = ({
                 {onCancel && (
                     <button
                         className="enrollment-card__btn enrollment-card__btn--danger"
-                        onClick={() => onCancel(enrollment.id)}
+                        onClick={() => onCancel(enrollment.enrollmentId)}
                         disabled={isProcessing}
                     >
                         Cancelar Inscripción

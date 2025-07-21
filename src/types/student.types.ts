@@ -35,14 +35,14 @@ export interface SubjectWithGroups {
 }
 
 export interface EnrollmentSummary {
-    id: number;
+    enrollmentId: number;
     groupId: number;
     subjectName: string;
     teacherName: string;
     groupType: 'REGULAR' | 'INTENSIVE';
     schedule: string;
     paymentStatus: 'PENDING' | 'PAID' | 'FAILED';
-    enrollmentDate: string;
+    createdAt: string;
 }
 
 export interface StudentProfile {
