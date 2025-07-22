@@ -1,0 +1,378 @@
+/* src/components/admin/subjects/DeleteConfirmationModal.css */
+
+/**
+ * Estilos para el modal de confirmación de eliminación.
+ *
+ * El diseño del modal sigue principios establecidos de UI/UX:
+ * 1. **Overlay oscuro**: Crea separación visual y enfoca la atención
+ * 2. **Animaciones suaves**: Reducen la jarring experience de aparición/desaparición
+ * 3. **Jerarquía clara**: Título → Contenido → Acciones
+ * 4. **Botones diferenciados**: La acción destructiva es visualmente distinta
+ *
+ * La estructura en capas (overlay → modal → contenido) permite
+ * flexibilidad en el posicionamiento y facilita las animaciones.
+ */
+
+/* ========== Overlay (Fondo oscuro) ========== */
+
+.modal-overlay {
+    /* Posicionamiento fijo que cubre toda la pantalla */
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    /* Fondo semi-transparente para oscurecer el contenido de atrás */
+    background-color: rgba(0, 0, 0, 0.5);
+
+    /* Centra el modal usando flexbox */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    /* Z-index alto para aparecer sobre todo */
+    z-index: 1000;
+
+    /* Padding para evitar que el modal toque los bordes en móvil */
+    padding: 1rem;
+
+    /* Animación de fade-in */
+    animation: fadeIn 0.2s ease-out;
+
+    /* Permite scroll si el modal es muy alto */
+    overflow-y: auto;
+}
+
+/* ========== Contenedor del Modal ========== */
+
+.modal {
+    /* Fondo blanco con bordes redondeados */
+    background-color: #ffffff;
+    border-radius: 12px;
+
+    /* Sombra pronunciada para elevar el modal visualmente */
+    box-shadow:
+            0 20px 25px -5px rgba(0, 0, 0, 0.1),
+            0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+    /* Tamaño y límites */
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+
+    /* Permite scroll interno si el contenido es muy largo */
+    display: flex;
+    flex-direction: column;
+
+    /* Animación de slide + fade */
+    animation: slideUp 0.3s ease-out;
+
+    /* Evita que el modal se estire demasiado en pantallas grandes */
+    margin: auto;
+}
+
+/* ========== Encabezado del Modal ========== */
+
+.modal__header {
+    /* Diseño flexible con título y botón de cerrar */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.modal__title {
+    /* Título prominente pero no abrumador */
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #111827;
+    margin: 0;
+}
+
+.modal__close {
+    /* Botón de cerrar minimalista */
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #6b7280;
+    cursor: pointer;
+    padding: 0.25rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+
+    /* Efectos hover y focus */
+    &:hover:not(:disabled) {
+        background-color: #f3f4f6;
+        color: #374151;
+    }
+
+    &:focus-visible {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+/* ========== Contenido del Modal ========== */
+
+.modal__content {
+    /* Padding generoso para legibilidad */
+    padding: 1.5rem;
+
+    /* Permite scroll si el contenido es muy largo */
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal__description {
+    /* Texto principal del modal */
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #374151;
+    margin: 0 0 1rem 0;
+}
+
+.modal__description strong {
+    /* Resalta información importante */
+    color: #111827;
+    font-weight: 600;
+}
+
+/* Estado de carga centrado */
+.modal__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+    text-align: center;
+    color: #6b7280;
+}
+
+/* ========== Pie del Modal ========== */
+
+.modal__footer {
+    /* Botones alineados a la derecha */
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    border-top: 1px solid #e5e7eb;
+
+    /* Fondo ligeramente gris para separación visual */
+    background-color: #f9fafb;
+
+    /* Bordes redondeados en la parte inferior */
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+}
+
+/* ========== Alertas dentro del Modal ========== */
+
+.modal .alert {
+    /* Alertas más compactas dentro del modal */
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+}
+
+.modal .alert--warning {
+    background-color: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+.modal .alert--error {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.alert__icon {
+    /* Emoji o icono más grande para visibilidad */
+    font-size: 1.25rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.alert__title {
+    font-weight: 600;
+    margin: 0 0 0.25rem 0;
+}
+
+.alert__message {
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* ========== Mejoras en Botones del Modal ========== */
+
+.modal .btn--danger {
+    /* Botón de eliminar más prominente y "peligroso" */
+    background-color: #dc2626;
+    color: white;
+
+    &:hover:not(:disabled) {
+        background-color: #b91c1c;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+
+    &:disabled {
+        background-color: #fca5a5;
+        cursor: not-allowed;
+    }
+}
+
+/* ========== Animaciones ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Animación de salida (se aplica con JS cuando se cierra) */
+.modal-overlay--closing {
+    animation: fadeOut 0.2s ease-out forwards;
+}
+
+.modal-overlay--closing .modal {
+    animation: slideDown 0.2s ease-out forwards;
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+}
+
+/* ========== Responsive Design ========== */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 640px) {
+    .modal {
+        /* Modal ocupa más ancho en pantallas pequeñas */
+        max-width: 100%;
+        margin: 0.5rem;
+    }
+
+    .modal__header,
+    .modal__content,
+    .modal__footer {
+        padding: 1rem;
+    }
+
+    .modal__footer {
+        /* Botones en columna en móvil si es necesario */
+        flex-wrap: wrap;
+    }
+
+    .modal__footer .btn {
+        flex: 1;
+        min-width: 120px;
+    }
+}
+
+/* Pantallas muy pequeñas */
+@media (max-width: 380px) {
+    .modal__footer {
+        flex-direction: column-reverse;
+    }
+
+    .modal__footer .btn {
+        width: 100%;
+    }
+}
+
+/* ========== Accesibilidad ========== */
+
+/* Modo de alto contraste */
+@media (prefers-contrast: high) {
+    .modal {
+        border: 2px solid #000;
+    }
+
+    .modal__close:focus-visible {
+        outline-width: 3px;
+    }
+
+    .btn--danger {
+        border: 2px solid #dc2626;
+    }
+}
+
+/* Reducir movimiento para usuarios sensibles */
+@media (prefers-reduced-motion: reduce) {
+    .modal-overlay,
+    .modal {
+        animation: none;
+    }
+
+    .modal .btn {
+        transition: none;
+    }
+}
+
+/* ========== Estados Especiales ========== */
+
+/* Cuando el modal está en estado de eliminación */
+.modal--deleting .modal__content {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Focus trap - asegura que el focus no salga del modal */
+.modal:focus-within {
+    box-shadow:
+            0 20px 25px -5px rgba(0, 0, 0, 0.15),
+            0 10px 10px -5px rgba(0, 0, 0, 0.08);
+}

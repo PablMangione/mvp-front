@@ -1,0 +1,268 @@
+/* src/components/admin/subjects/SubjectForm.css */
+
+/**
+ * Estilos para el formulario de asignaturas.
+ *
+ * El diseño del formulario sigue principios de UX establecidos:
+ * 1. **Espaciado generoso**: Reduce la sensación de aglomeración
+ * 2. **Jerarquía visual clara**: El usuario sabe qué hacer primero
+ * 3. **Feedback inmediato**: Estados visuales para cada interacción
+ * 4. **Accesibilidad**: Contrastes adecuados y áreas de click amplias
+ *
+ * La estructura visual guía al usuario a través del proceso de
+ * completar el formulario de manera natural y sin fricción.
+ */
+
+/* ========== Contenedor Principal ========== */
+
+.subject-form {
+    /* Centra el formulario y limita su ancho para mejor legibilidad */
+    max-width: 600px;
+    margin: 0 auto;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+
+    /* Animación suave de entrada */
+    animation: slideIn 0.3s ease-out;
+}
+
+/* ========== Encabezado del Formulario ========== */
+
+.subject-form__header {
+    margin-bottom: 2rem;
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.subject-form__title {
+    font-size: 1.75rem;
+    color: #1e293b;
+    margin: 0 0 0.5rem 0;
+    font-weight: 600;
+}
+
+.subject-form__subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+    line-height: 1.5;
+}
+
+/* ========== Formulario ========== */
+
+.subject-form__form {
+    /* Espaciado entre campos del formulario */
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* ========== Mensajes de Alerta ========== */
+
+.alert {
+    padding: 1rem 1.25rem;
+    border-radius: 6px;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+
+    /* Animación de aparición */
+    animation: fadeIn 0.3s ease-out;
+}
+
+.alert--error {
+    background-color: #fee2e2;
+    border: 1px solid #fecaca;
+    color: #991b1b;
+}
+
+.alert--success {
+    background-color: #dcfce7;
+    border: 1px solid #bbf7d0;
+    color: #166534;
+}
+
+.alert--warning {
+    background-color: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #92400e;
+}
+
+/* ========== Acciones del Formulario ========== */
+
+.subject-form__actions {
+    /* Botones alineados a la derecha con espacio entre ellos */
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #f3f4f6;
+}
+
+/* ========== Estados de Carga ========== */
+
+.subject-form__loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Spinner pequeño para usar dentro de botones */
+.spinner--small {
+    width: 16px;
+    height: 16px;
+    border-width: 2px;
+    margin-right: 0.5rem;
+    display: inline-block;
+}
+
+/* ========== Mejoras en los Botones ========== */
+
+/* Extendemos los estilos base de botones con efectos adicionales */
+.subject-form .btn {
+    /* Transición más suave para estados disabled */
+    transition: all 0.2s ease;
+}
+
+.subject-form .btn:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+
+    /* Evita efectos hover cuando está deshabilitado */
+    &:hover {
+        transform: none;
+        box-shadow: none;
+    }
+}
+
+/* Botón primario con spinner */
+.subject-form .btn--primary:disabled {
+    background-color: #93bbfc;
+}
+
+/* ========== Responsive Design ========== */
+
+/* Tablets */
+@media (max-width: 768px) {
+    .subject-form {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+
+    .subject-form__header {
+        text-align: left;
+    }
+
+    .subject-form__title {
+        font-size: 1.5rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 480px) {
+    .subject-form {
+        margin: 0.5rem;
+        padding: 1rem;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .subject-form__actions {
+        /* Stack vertical en móviles muy pequeños */
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .subject-form__actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* ========== Animaciones ========== */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* ========== Mejoras de Accesibilidad ========== */
+
+/* Focus visible para navegación por teclado */
+.subject-form__form *:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Asegura que los labels sean claramente legibles */
+.subject-form .form-field__label {
+    font-weight: 500;
+    color: #374151;
+}
+
+/* Estados de hover más evidentes para elementos interactivos */
+.subject-form__form select:hover:not(:disabled),
+.subject-form__form input:hover:not(:disabled) {
+    border-color: #94a3b8;
+}
+
+/* ========== Personalización de FormField en este contexto ========== */
+
+/* Ajustes específicos para los campos dentro del formulario de asignaturas */
+.subject-form .form-field {
+    margin-bottom: 0; /* Removemos el margin porque usamos gap en el form */
+}
+
+.subject-form .form-field__helper {
+    font-size: 0.8125rem;
+    margin-top: 0.375rem;
+}
+
+/* Select con placeholder visualmente diferenciado */
+.subject-form select option:first-child {
+    color: #9ca3af;
+}
+
+/* ========== Utilidades para Estados Especiales ========== */
+
+/* Clase para campos que han sido autocompletados por el navegador */
+.subject-form input:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0 1000px white inset;
+    box-shadow: 0 0 0 1000px white inset;
+    -webkit-text-fill-color: #374151;
+}
+
+/* Mejora visual para campos deshabilitados */
+.subject-form .form-field__input:disabled {
+    background-color: #f9fafb;
+    color: #9ca3af;
+    cursor: not-allowed;
+}

@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
 import { ProtectedRoute } from './components/common';
 import { StudentLayout } from './components/student/StudentLayout';
+import { AdminLayout } from "./components/admin/AdminLayout";
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
 import { Register } from './pages/auth/Register';
@@ -12,8 +13,8 @@ import { Enrollments } from './pages/student/Enrollment';
 import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
 import { AdminDashboard } from './pages/admin/Dashboard';
+import { SubjectList, SubjectForm, SubjectDetail } from "./components/admin/subjects";
 import './App.css';
-import {AdminLayout} from "./components/admin/AdminLayout.tsx";
 
 function App() {
     return (
@@ -27,7 +28,7 @@ function App() {
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
 
-                    {/* Rutas protegidas para estudiantes - REFACTORIZADO */}
+                    {/* Rutas protegidas para estudiantes */}
                     <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
                         {/* StudentLayout envuelve todas las rutas del estudiante */}
                         <Route element={<StudentLayout />}>
@@ -41,13 +42,31 @@ function App() {
 
                     {/* Rutas protegidas para profesores */}
                     <Route element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
-                        {/*<Route path="/admin/*" element={<AdminRoutes />} />*/}
+                        {/* Aquí irán las rutas de profesores cuando se implementen */}
+                        {/* <Route path="/teacher/*" element={<TeacherLayout />} /> */}
                     </Route>
 
                     {/* Rutas protegidas para administradores */}
-                    <Route element={<AdminLayout />}>
-                        <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
+                        {/* AdminLayout envuelve todas las rutas del administrador */}
+                        <Route element={<AdminLayout />}>
+                            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                            <Route path="/admin/subjects" element={<SubjectList />} />
+                            <Route path="/admin/subjects/new" element={<SubjectForm />} />
+                            <Route path="/admin/subjects/:id" element={<SubjectDetail />} />
+                            <Route path="/admin/subjects/:id/edit" element={<SubjectForm />} />
+
+                            {/* Futuras rutas de administrador */}
+                            {/* <Route path="/admin/subjects/:id" element={<SubjectDetail />} /> */}
+                            {/* <Route path="/admin/students" element={<StudentList />} /> */}
+                            {/* <Route path="/admin/teachers" element={<TeacherList />} /> */}
+                            {/* <Route path="/admin/groups" element={<GroupList />} /> */}
+                            {/* <Route path="/admin/requests" element={<RequestList />} /> */}
+                        </Route>
                     </Route>
+
+                    {/* Ruta 404 - Página no encontrada */}
+                    {/* <Route path="*" element={<NotFound />} /> */}
                 </Routes>
             </AuthProvider>
         </Router>

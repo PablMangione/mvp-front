@@ -108,7 +108,7 @@ class SubjectManagementService extends BaseService {
      * - Resolver todas las solicitudes de grupo pendientes
      * - Verificar que no sea parte activa del plan de estudios
      */
-    async deleteSubject(subjectId: number): Promise<DeleteResponseDto> {
+    async deleteSubject(subjectId: number | undefined): Promise<DeleteResponseDto> {
         return this.delete<DeleteResponseDto>(`/subjects/${subjectId}`);
     }
 
@@ -142,7 +142,7 @@ class SubjectManagementService extends BaseService {
      * Verifica si una asignatura puede ser eliminada.
      * No puede eliminarse si tiene grupos o solicitudes pendientes.
      */
-    async canDeleteSubject(subjectId: number): Promise<boolean> {
+    async canDeleteSubject(subjectId: number | undefined): Promise<boolean> {
         try {
             const response = await this.get<{ canDelete: boolean }>(
                 `/subjects/${subjectId}/can-delete`

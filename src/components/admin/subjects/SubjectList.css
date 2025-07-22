@@ -1,0 +1,385 @@
+/* src/components/admin/subjects/SubjectList.css */
+
+/**
+ * Estilos para el componente SubjectList.
+ *
+ * La estructura visual sigue estos principios:
+ * 1. Claridad: Información fácil de escanear visualmente
+ * 2. Jerarquía: Elementos organizados por importancia
+ * 3. Responsive: Adaptable a diferentes tamaños de pantalla
+ * 4. Consistencia: Alineado con el diseño general del admin
+ *
+ * La paleta de colores mantiene coherencia con AdminLayout y AdminSidebar,
+ * usando grises para estructura y azules para acciones principales.
+ */
+
+/* ========== Contenedor Principal ========== */
+
+.subject-list {
+    /* El contenedor usa todo el espacio disponible del AdminLayout */
+    width: 100%;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    padding: 2rem;
+
+    /* Animación suave al cargar */
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* ========== Encabezado ========== */
+
+.subject-list__header {
+    /* Flexbox para alinear título y botón en extremos opuestos */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #f3f4f6;
+}
+
+.subject-list__title {
+    font-size: 1.875rem;
+    color: #1e293b;
+    margin: 0;
+    font-weight: 600;
+}
+
+/* ========== Barra de Filtros ========== */
+
+.subject-list__filters {
+    /* Grid para distribución uniforme de filtros */
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background-color: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.filter-input,
+.filter-select {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    background-color: white;
+    transition: all 0.2s;
+
+    /* Mejora la experiencia al interactuar */
+    &:hover {
+        border-color: #94a3b8;
+    }
+
+    &:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+}
+
+.filter-results {
+    /* Auto-alineación al final de la fila */
+    display: flex;
+    align-items: flex-end;
+    font-size: 0.875rem;
+    color: #64748b;
+    font-style: italic;
+}
+
+/* ========== Tabla de Asignaturas ========== */
+
+.subject-list__table-container {
+    /* Permite scroll horizontal en pantallas pequeñas */
+    overflow-x: auto;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+}
+
+.subject-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.subject-table thead {
+    background-color: #f8fafc;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.subject-table th {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+}
+
+/* Columnas que se pueden ordenar muestran cursor pointer */
+.subject-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #f1f5f9;
+    }
+}
+
+.subject-table tbody tr {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+
+    &:hover {
+        background-color: #fafbfc;
+    }
+}
+
+.subject-table td {
+    padding: 1rem;
+    color: #334155;
+}
+
+/* Alineación específica para ciertas columnas */
+.text-center {
+    text-align: center;
+}
+
+/* Enlaces en la tabla de asignaturas */
+.subject-link {
+    color: #3b82f6;
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.2s;
+
+    /* Efecto hover */
+    &:hover {
+        color: #2563eb;
+        text-decoration: underline;
+    }
+
+    /* Estado visitado más sutil */
+    &:visited {
+        color: #3b82f6;
+    }
+}
+
+/* Columna de acciones */
+.subject-table td.actions {
+    white-space: nowrap;
+    width: 1%;
+    text-align: center;
+}
+
+.subject-table td.actions button {
+    margin: 0 0.25rem;
+}
+
+/* Mensaje cuando no hay resultados */
+.empty-message {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* ========== Estados de Carga y Error ========== */
+
+.subject-list__loading,
+.subject-list__error {
+    /* Centrado vertical y horizontal */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 1rem;
+}
+
+.subject-list__error {
+    color: #dc2626;
+}
+
+/* Spinner de carga animado */
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f4f6;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ========== Botones ========== */
+
+.btn {
+    /* Estilos base compartidos por todos los botones */
+    padding: 0.625rem 1.25rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-decoration: none;
+
+    /* Previene selección de texto en botones */
+    user-select: none;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+}
+
+/* Variantes de botones */
+.btn--primary {
+    background-color: #3b82f6;
+    color: white;
+
+    &:hover:not(:disabled) {
+        background-color: #2563eb;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+    }
+
+    &:active:not(:disabled) {
+        transform: translateY(0);
+    }
+}
+
+.btn--secondary {
+    background-color: #e2e8f0;
+    color: #475569;
+
+    &:hover:not(:disabled) {
+        background-color: #cbd5e1;
+    }
+}
+
+.btn--danger {
+    background-color: #fee2e2;
+    color: #dc2626;
+
+    &:hover:not(:disabled) {
+        background-color: #fecaca;
+    }
+}
+
+/* Botones pequeños para acciones en tabla */
+.btn--small {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+}
+
+/* ========== Responsive Design ========== */
+
+/* Tablets y pantallas medianas */
+@media (max-width: 1024px) {
+    .subject-list__filters {
+        /* Cambia a 2 columnas en tablets */
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .filter-results {
+        /* Ocupa toda la fila */
+        grid-column: 1 / -1;
+        justify-content: center;
+        margin-top: 0.5rem;
+    }
+}
+
+/* Móviles */
+@media (max-width: 640px) {
+    .subject-list {
+        padding: 1rem;
+    }
+
+    .subject-list__header {
+        /* Stack vertical en móvil */
+        flex-direction: column;
+        gap: 1rem;
+        align-items: stretch;
+    }
+
+    .subject-list__title {
+        font-size: 1.5rem;
+        text-align: center;
+    }
+
+    .subject-list__filters {
+        /* Una columna en móvil */
+        grid-template-columns: 1fr;
+        padding: 1rem;
+    }
+
+    /* Ocultar algunas columnas en móvil para mejor lectura */
+    .subject-table th:nth-child(1),
+    .subject-table td:nth-child(1) {
+        display: none; /* Ocultar ID en móvil */
+    }
+
+    /* Hacer la tabla más compacta */
+    .subject-table th,
+    .subject-table td {
+        padding: 0.75rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Botones de acción más pequeños en móvil */
+    .btn--small {
+        padding: 0.25rem 0.5rem;
+    }
+}
+
+/* ========== Animaciones ========== */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ========== Utilidades ========== */
+
+/* Para mejorar la accesibilidad con lectores de pantalla */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}

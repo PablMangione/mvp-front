@@ -167,6 +167,8 @@ class GroupManagementService extends BaseService {
     async getGroupsByTeacher(teacherId: number): Promise<CourseGroupDto[]> {
         return this.get<CourseGroupDto[]>(`/teachers/${teacherId}/groups`);
     }
+
+
 }
 
 // Exportar instancia única del servicio
