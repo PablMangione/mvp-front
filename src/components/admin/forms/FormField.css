@@ -1,0 +1,398 @@
+/* src/components/admin/forms/FormField.css */
+
+/**
+ * Estilos para el componente FormField.
+ *
+ * Estos estilos están diseñados siguiendo principios de diseño de formularios:
+ * 1. Claridad: Cada elemento debe tener un propósito visual claro
+ * 2. Consistencia: Todos los campos deben comportarse de manera predecible
+ * 3. Feedback: Los usuarios deben saber el estado del campo en cualquier momento
+ * 4. Accesibilidad: Cumplir con WCAG 2.1 nivel AA
+ *
+ * La estructura visual sigue una jerarquía clara:
+ * - Label (arriba): Identifica el campo
+ * - Input (centro): Área de interacción principal
+ * - Helper/Error (abajo): Información adicional o feedback
+ */
+
+/* Contenedor principal del campo */
+.form-field {
+    /* Usamos CSS Grid para un layout flexible y predecible */
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    width: 100%;
+    position: relative;
+}
+
+/* Modificador para ancho completo */
+.form-field--full-width {
+    width: 100%;
+}
+
+/* Label del campo */
+.form-field__label {
+    /* El label debe ser claramente visible pero no competir con el input */
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+
+    /* Transición suave para cambios de estado */
+    transition: color 0.2s ease;
+}
+
+/* Indicador de campo requerido */
+.form-field__required {
+    /* El asterisco rojo es una convención universal */
+    color: #ef4444;
+    font-weight: 700;
+    /* Ligeramente más grande para visibilidad */
+    font-size: 1rem;
+    /* Evitar que sea leído como "asterisco" por lectores de pantalla */
+    speak: none;
+}
+
+/* Contenedor del input - proporciona estilos consistentes */
+.form-field__input-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+/* Estilos base para todos los tipos de input */
+.form-field__input {
+    /* Tamaño y espaciado generoso para facilitar la interacción */
+    width: 100%;
+    padding: 0.75rem 1rem;
+
+    /* Bordes claros pero no intrusivos */
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+
+    /* Fondo ligeramente gris para distinguir del blanco puro */
+    background-color: #ffffff;
+
+    /* Tipografía consistente con el resto de la aplicación */
+    font-size: 0.9375rem;
+    line-height: 1.5;
+    color: #111827;
+
+    /* Transiciones para estados interactivos */
+    transition: all 0.2s ease;
+
+    /* Eliminar estilos por defecto del navegador */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+}
+
+/* Estado hover - feedback sutil */
+.form-field__input:hover:not(:disabled):not(:focus) {
+    border-color: #9ca3af;
+    background-color: #f9fafb;
+}
+
+/* Estado focus - feedback claro de dónde está el usuario */
+.form-field__input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    /* Doble indicador: borde y sombra */
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    background-color: #ffffff;
+}
+
+/* Placeholder con contraste apropiado */
+.form-field__input::placeholder {
+    color: #9ca3af;
+    /* Evitar que el placeholder parezca contenido real */
+    opacity: 0.8;
+}
+
+/* Select específicos */
+.form-field__select {
+    /* Añadir flecha personalizada */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.75rem center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+    /* Espacio para la flecha */
+    padding-right: 2.5rem;
+    cursor: pointer;
+}
+
+/* Textarea específicos */
+.form-field__textarea {
+    /* Altura mínima para ser útil */
+    min-height: 100px;
+    /* Permitir resize vertical por defecto */
+    resize: vertical;
+    /* Mantener consistencia tipográfica */
+    font-family: inherit;
+    line-height: 1.5;
+}
+
+/* Estados de error */
+.form-field--error .form-field__label {
+    /* Label en rojo para indicar problema */
+    color: #dc2626;
+}
+
+.form-field--error .form-field__input {
+    /* Borde rojo claro */
+    border-color: #f87171;
+    /* Fondo con tinte rojo muy sutil */
+    background-color: #fef2f2;
+}
+
+.form-field--error .form-field__input:focus {
+    /* Mantener indicador de error incluso en focus */
+    border-color: #dc2626;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Icono de error */
+.form-field__error-icon {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.25rem;
+    /* Animar entrada del icono */
+    animation: errorIconBounce 0.5s ease;
+}
+
+@keyframes errorIconBounce {
+    0%, 100% { transform: translateY(-50%) scale(1); }
+    25% { transform: translateY(-50%) scale(1.1); }
+    75% { transform: translateY(-50%) scale(0.9); }
+}
+
+/* Para textarea, ajustar posición del icono */
+.form-field__textarea ~ .form-field__error-icon {
+    top: 1.5rem;
+    transform: translateY(0);
+}
+
+/* Estado disabled */
+.form-field--disabled .form-field__label {
+    color: #9ca3af;
+}
+
+.form-field--disabled .form-field__input {
+    background-color: #f3f4f6;
+    color: #6b7280;
+    cursor: not-allowed;
+    /* Menor contraste para indicar no interactivo */
+    border-color: #e5e7eb;
+}
+
+/* Mensajes debajo del campo */
+.form-field__helper-text,
+.form-field__error-message {
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+    /* Animar entrada de mensajes */
+    animation: messageSlideIn 0.2s ease;
+}
+
+@keyframes messageSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Texto de ayuda - informativo */
+.form-field__helper-text {
+    color: #6b7280;
+}
+
+/* Mensaje de error - urgente */
+.form-field__error-message {
+    color: #dc2626;
+    font-weight: 500;
+    /* Icono inline para reforzar el mensaje */
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.form-field__error-message::before {
+    content: '⚠️';
+    font-size: 0.875rem;
+}
+
+/* Tipos de input específicos */
+
+/* Campos numéricos - alinear a la derecha */
+.form-field__input[type="number"] {
+    text-align: right;
+    /* Ocultar spinners por defecto para consistencia */
+    -moz-appearance: textfield;
+}
+
+.form-field__input[type="number"]::-webkit-inner-spin-button,
+.form-field__input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Campos de fecha y hora */
+.form-field__input[type="date"],
+.form-field__input[type="time"],
+.form-field__input[type="datetime-local"] {
+    /* Mantener consistencia visual */
+    min-height: 42px;
+}
+
+/*
+ * Responsive Design
+ */
+
+/* Tablets */
+@media (max-width: 768px) {
+    .form-field {
+        margin-bottom: 1.25rem;
+    }
+
+    .form-field__input {
+        /* Touch targets más grandes en móvil */
+        padding: 0.875rem 1rem;
+        font-size: 1rem;
+    }
+}
+
+/* Móviles pequeños */
+@media (max-width: 480px) {
+    .form-field__label {
+        font-size: 0.9375rem;
+    }
+
+    .form-field__input {
+        /* Maximizar área táctil */
+        padding: 1rem;
+    }
+
+    /* Ajustar select en móvil */
+    .form-field__select {
+        background-position: right 0.5rem center;
+    }
+}
+
+/*
+ * Variantes y modificadores adicionales
+ */
+
+/* Campos inline (para formularios compactos) */
+.form-field--inline {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 1rem;
+}
+
+.form-field--inline .form-field__label {
+    margin-bottom: 0;
+    min-width: 120px;
+}
+
+.form-field--inline .form-field__input-wrapper {
+    flex: 1;
+}
+
+/* Grupo de campos relacionados */
+.form-field-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1rem;
+}
+
+/* Campo con addon (ej: prefijo o sufijo) */
+.form-field__input-addon {
+    display: flex;
+    align-items: stretch;
+}
+
+.form-field__input-addon .form-field__input {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+.form-field__addon-prefix,
+.form-field__addon-suffix {
+    display: flex;
+    align-items: center;
+    padding: 0 1rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.form-field__addon-prefix {
+    border-radius: 6px 0 0 6px;
+    border-right: none;
+}
+
+.form-field__addon-suffix {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+}
+
+/*
+ * Animaciones adicionales para mejorar la percepción
+ */
+
+/* Transición suave al cambiar entre estados */
+.form-field * {
+    transition-property: color, background-color, border-color, box-shadow;
+    transition-duration: 0.2s;
+    transition-timing-function: ease;
+}
+
+/* Efecto de "sacudida" para errores graves */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+    20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+.form-field--error.form-field--shake .form-field__input {
+    animation: shake 0.5s ease;
+}
+
+/* Modo oscuro (preparado para futura implementación) */
+@media (prefers-color-scheme: dark) {
+    .form-field__label {
+        color: #e5e7eb;
+    }
+
+    .form-field__input {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .form-field__input:hover:not(:disabled) {
+        background-color: #111827;
+        border-color: #4b5563;
+    }
+
+    .form-field__input:focus {
+        border-color: #3b82f6;
+        background-color: #111827;
+    }
+
+    .form-field--disabled .form-field__input {
+        background-color: #374151;
+        color: #9ca3af;
+    }
+}

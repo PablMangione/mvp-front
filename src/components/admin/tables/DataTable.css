@@ -1,0 +1,428 @@
+/* src/components/admin/tables/DataTable.css */
+
+/**
+ * Estilos para el componente DataTable.
+ *
+ * Diseñado para proporcionar una experiencia de tabla profesional
+ * con soporte completo para interacciones, estados y responsividad.
+ * La tabla se adapta elegantemente desde desktop hasta móvil.
+ */
+
+/* Contenedor principal de la tabla */
+.data-table-container {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+}
+
+/* Título opcional de la tabla */
+.data-table__title {
+    margin: 0;
+    padding: 1.5rem;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #1e293b;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Wrapper con scroll horizontal para responsividad */
+.data-table__wrapper {
+    overflow-x: auto;
+    position: relative;
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling en iOS */
+}
+
+/* Tabla principal */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+/* Encabezado de la tabla */
+.data-table__header {
+    background-color: #f8fafc;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+/* Celdas del encabezado */
+.data-table__header-cell {
+    padding: 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+    position: relative;
+    user-select: none;
+}
+
+/* Encabezados ordenables */
+.data-table__header-cell.sortable {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.data-table__header-cell.sortable:hover {
+    background-color: #f1f5f9;
+}
+
+/* Contenido del encabezado con indicador de orden */
+.data-table__header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+/* Indicador de ordenamiento */
+.data-table__sort-indicator {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin-left: 0.5rem;
+}
+
+.sort-arrow {
+    font-size: 0.625rem;
+    color: #cbd5e1;
+    line-height: 0.5;
+    transition: color 0.2s;
+}
+
+.sort-arrow.active {
+    color: #3b82f6;
+}
+
+/* Cuerpo de la tabla */
+.data-table__body {
+    background-color: white;
+}
+
+/* Filas de datos */
+.data-table__row {
+    border-bottom: 1px solid #f1f5f9;
+    transition: background-color 0.2s;
+}
+
+.data-table__row:hover {
+    background-color: #f8fafc;
+}
+
+/* Fila clickeable */
+.data-table__row.clickable {
+    cursor: pointer;
+}
+
+.data-table__row.clickable:hover {
+    background-color: #eff6ff;
+}
+
+/* Fila siendo eliminada */
+.data-table__row.deleting {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+.data-table__row.deleting::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.7);
+}
+
+/* Celdas de datos */
+.data-table__cell {
+    padding: 1rem;
+    color: #1e293b;
+    vertical-align: middle;
+}
+
+/* Celda de índice */
+.data-table__index-cell {
+    width: 50px;
+    text-align: center;
+    font-weight: 500;
+    color: #64748b;
+}
+
+/* Celda de acciones */
+.data-table__actions-cell {
+    width: auto;
+    text-align: center;
+    white-space: nowrap;
+}
+
+/* Contenedor de acciones */
+.data-table__actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Botones de acción */
+.data-table__action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.375rem 0.75rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+/* Variantes de botones */
+.data-table__action-btn--primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.data-table__action-btn--primary:hover:not(:disabled) {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.data-table__action-btn--secondary {
+    background-color: #e5e7eb;
+    color: #475569;
+}
+
+.data-table__action-btn--secondary:hover:not(:disabled) {
+    background-color: #d1d5db;
+    color: #1e293b;
+}
+
+.data-table__action-btn--success {
+    background-color: #10b981;
+    color: white;
+}
+
+.data-table__action-btn--success:hover:not(:disabled) {
+    background-color: #059669;
+}
+
+.data-table__action-btn--danger {
+    background-color: #ef4444;
+    color: white;
+}
+
+.data-table__action-btn--danger:hover:not(:disabled) {
+    background-color: #dc2626;
+}
+
+/* Estado deshabilitado */
+.data-table__action-btn:disabled,
+.data-table__action-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Icono de carga en acciones */
+.data-table__action-loading {
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+/* Label de acción (oculto en móvil) */
+.data-table__action-label {
+    display: inline;
+}
+
+/* Overlay de carga */
+.data-table__loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+/* Estilos para estado vacío (ya definidos en EmptyState) */
+.data-table-container .empty-state {
+    padding: 4rem 2rem;
+}
+
+/* Indicador de scroll horizontal en móvil */
+@media (max-width: 768px) {
+    .data-table__wrapper {
+        position: relative;
+    }
+
+    /* Sombra para indicar scroll */
+    .data-table__wrapper::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 30px;
+        background: linear-gradient(to left, rgba(0,0,0,0.1), transparent);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .data-table__wrapper:hover::after {
+        opacity: 1;
+    }
+}
+
+/*
+ * Responsive Design
+ */
+
+/* Tablets */
+@media (max-width: 1024px) {
+    .data-table__header-cell,
+    .data-table__cell {
+        padding: 0.75rem;
+    }
+
+    .data-table__actions {
+        flex-wrap: wrap;
+    }
+}
+
+/* Móviles */
+@media (max-width: 640px) {
+    /* Reducir padding en móvil */
+    .data-table__header-cell,
+    .data-table__cell {
+        padding: 0.625rem 0.5rem;
+        font-size: 0.8125rem;
+    }
+
+    /* Ocultar labels de acciones, solo mostrar iconos */
+    .data-table__action-label {
+        display: none;
+    }
+
+    /* Ajustar tamaño de botones */
+    .data-table__action-btn {
+        padding: 0.5rem;
+        min-width: 32px;
+        justify-content: center;
+    }
+
+    /* Stack de acciones verticalmente si hay muchas */
+    .data-table__actions {
+        flex-direction: column;
+        gap: 0.375rem;
+    }
+
+    /* Hacer la tabla más compacta */
+    .data-table {
+        font-size: 0.8125rem;
+    }
+}
+
+/* Modo de tabla compacta (alternativa para muchos datos) */
+.data-table-container.compact .data-table__header-cell,
+.data-table-container.compact .data-table__cell {
+    padding: 0.5rem 0.75rem;
+}
+
+.data-table-container.compact .data-table {
+    font-size: 0.8125rem;
+}
+
+/* Animaciones de entrada */
+.data-table__row {
+    animation: tableRowFadeIn 0.3s ease-out;
+    animation-fill-mode: both;
+}
+
+/* Delay escalonado para las primeras filas */
+.data-table__row:nth-child(1) { animation-delay: 0.05s; }
+.data-table__row:nth-child(2) { animation-delay: 0.1s; }
+.data-table__row:nth-child(3) { animation-delay: 0.15s; }
+.data-table__row:nth-child(4) { animation-delay: 0.2s; }
+.data-table__row:nth-child(5) { animation-delay: 0.25s; }
+
+@keyframes tableRowFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos especiales para celdas con badges o estados */
+.data-table__cell .badge {
+    display: inline-block;
+    padding: 0.25rem 0.625rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.data-table__cell .badge--success {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.data-table__cell .badge--warning {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.data-table__cell .badge--danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.data-table__cell .badge--info {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+/* Soporte para modo oscuro (si se implementa en el futuro) */
+@media (prefers-color-scheme: dark) {
+    .data-table-container {
+        background-color: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .data-table__header {
+        background-color: #0f172a;
+    }
+
+    .data-table__header-cell {
+        color: #e2e8f0;
+    }
+
+    .data-table__row {
+        border-bottom-color: #334155;
+    }
+
+    .data-table__row:hover {
+        background-color: #334155;
+    }
+
+    .data-table__cell {
+        color: #f1f5f9;
+    }
+}

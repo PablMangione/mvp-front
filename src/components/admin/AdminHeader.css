@@ -1,0 +1,493 @@
+/* src/components/admin/AdminHeader.css */
+
+/**
+ * Estilos para el header del panel administrativo.
+ *
+ * Diseñado para complementar el sidebar con un estilo profesional
+ * y moderno. El header permanece fijo en la parte superior para
+ * acceso constante a funciones importantes.
+ */
+
+/* Contenedor principal del header */
+.admin-header {
+    background-color: white;
+    padding: 1rem 2rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    min-height: 70px;
+}
+
+/* Sección izquierda del header */
+.admin-header__left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Botón de menú (solo móvil) */
+.admin-header__menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #475569;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.admin-header__menu-btn:hover {
+    background-color: #f1f5f9;
+    color: #1e293b;
+}
+
+/* Información contextual */
+.admin-header__context {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.admin-header__title {
+    font-size: 1.5rem;
+    color: #1e293b;
+    margin: 0;
+    font-weight: 600;
+}
+
+.admin-header__subtitle {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Sección derecha del header */
+.admin-header__right {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Notificaciones */
+.admin-header__notifications {
+    position: relative;
+}
+
+.admin-header__notification-btn {
+    position: relative;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.admin-header__notification-btn:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+}
+
+/* Badge de notificaciones */
+.notification-badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    background-color: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    padding: 0.1rem 0.4rem;
+    border-radius: 10px;
+    min-width: 18px;
+    text-align: center;
+    font-weight: 600;
+}
+
+/* Dropdown de notificaciones */
+.admin-header__notification-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    min-width: 350px;
+    max-width: 400px;
+    z-index: 1000;
+    animation: dropdownSlide 0.2s ease-out;
+}
+
+@keyframes dropdownSlide {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.notification-header {
+    padding: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-header h3 {
+    margin: 0;
+    font-size: 1rem;
+    color: #1e293b;
+}
+
+.mark-all-read {
+    background: none;
+    border: none;
+    color: #3b82f6;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.mark-all-read:hover {
+    color: #2563eb;
+    text-decoration: underline;
+}
+
+.notification-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.notification-item {
+    padding: 1rem;
+    border-bottom: 1px solid #f1f5f9;
+    display: flex;
+    gap: 0.75rem;
+    transition: background-color 0.2s;
+    cursor: pointer;
+}
+
+.notification-item:hover {
+    background-color: #f8fafc;
+}
+
+.notification-item.unread {
+    background-color: #eff6ff;
+}
+
+.notification-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #3b82f6;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+}
+
+.notification-text {
+    margin: 0 0 0.25rem;
+    color: #1e293b;
+    font-size: 0.875rem;
+    line-height: 1.4;
+}
+
+.notification-time {
+    font-size: 0.75rem;
+    color: #94a3b8;
+}
+
+.notification-footer {
+    padding: 0.75rem 1rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.view-all-notifications {
+    width: 100%;
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    color: #3b82f6;
+    font-size: 0.875rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.view-all-notifications:hover {
+    background-color: #f1f5f9;
+    border-color: #3b82f6;
+}
+
+/* Botón de configuración */
+.admin-header__settings-btn {
+    background: none;
+    border: none;
+    font-size: 1.3rem;
+    color: #64748b;
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.admin-header__settings-btn:hover {
+    background-color: #f1f5f9;
+    color: #475569;
+    transform: rotate(90deg);
+}
+
+/* Sección de usuario */
+.admin-header__user {
+    position: relative;
+}
+
+.admin-header__user-btn {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: none;
+    border: 1px solid #e2e8f0;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.admin-header__user-btn:hover {
+    background-color: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+/* Avatar del usuario */
+.admin-header__user-avatar {
+    width: 38px;
+    height: 38px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Información del usuario */
+.admin-header__user-info {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+}
+
+.admin-header__user-name {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.admin-header__user-role {
+    font-size: 0.75rem;
+    color: #64748b;
+    font-weight: 500;
+}
+
+/* Flecha del dropdown */
+.admin-header__dropdown-arrow {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    transition: transform 0.2s;
+}
+
+.admin-header__user-btn:hover .admin-header__dropdown-arrow {
+    transform: translateY(2px);
+}
+
+/* Dropdown del usuario */
+.admin-header__dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    right: 0;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    min-width: 280px;
+    z-index: 1000;
+    animation: dropdownSlide 0.2s ease-out;
+}
+
+/* Header del dropdown */
+.admin-header__dropdown-header {
+    padding: 1.25rem;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+}
+
+.dropdown-avatar {
+    width: 48px;
+    height: 48px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 1.25rem;
+}
+
+.dropdown-info {
+    flex: 1;
+}
+
+.admin-header__dropdown-name {
+    font-weight: 600;
+    color: #1e293b;
+    margin: 0 0 0.25rem 0;
+}
+
+.admin-header__dropdown-email {
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0 0 0.5rem 0;
+}
+
+.admin-header__dropdown-role {
+    margin: 0;
+}
+
+.role-badge {
+    display: inline-block;
+    background-color: #dbeafe;
+    color: #1e40af;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* Divider */
+.admin-header__dropdown-divider {
+    height: 1px;
+    background-color: #e2e8f0;
+    margin: 0;
+}
+
+/* Items del dropdown */
+.admin-header__dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    background: none;
+    border: none;
+    text-align: left;
+    color: #475569;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    font-size: 0.9rem;
+}
+
+.admin-header__dropdown-item:hover {
+    background-color: #f8fafc;
+    color: #1e293b;
+}
+
+.admin-header__logout {
+    color: #dc2626;
+}
+
+.admin-header__logout:hover {
+    background-color: #fef2f2;
+    color: #b91c1c;
+}
+
+/* Scrollbar personalizado para notificaciones */
+.notification-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.notification-list::-webkit-scrollbar-track {
+    background: #f1f5f9;
+}
+
+.notification-list::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+}
+
+/*
+ * Responsive Design
+ */
+@media (max-width: 1024px) {
+    .admin-header__menu-btn {
+        display: block;
+    }
+}
+
+@media (max-width: 768px) {
+    .admin-header {
+        padding: 1rem;
+    }
+
+    .admin-header__title {
+        font-size: 1.25rem;
+    }
+
+    .admin-header__subtitle {
+        display: none;
+    }
+
+    .admin-header__user-info {
+        display: none;
+    }
+
+    .admin-header__dropdown-arrow {
+        display: none;
+    }
+
+    .admin-header__user-btn {
+        padding: 0.5rem;
+        border: none;
+    }
+
+    .admin-header__notification-dropdown {
+        left: auto;
+        right: -1rem;
+        min-width: calc(100vw - 2rem);
+    }
+
+    .admin-header__dropdown {
+        left: auto;
+        right: -1rem;
+        min-width: calc(100vw - 2rem);
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-header__settings-btn {
+        display: none;
+    }
+}

@@ -11,7 +11,9 @@ import { Profile } from './pages/student/Profile';
 import { Enrollments } from './pages/student/Enrollment';
 import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
+import { AdminDashboard } from './pages/admin/Dashboard';
 import './App.css';
+import {AdminLayout} from "./components/admin/AdminLayout.tsx";
 
 function App() {
     return (
@@ -39,12 +41,12 @@ function App() {
 
                     {/* Rutas protegidas para profesores */}
                     <Route element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
-                        {/* <Route path="/teacher/dashboard" element={<TeacherDashboard />} /> */}
+                        {/*<Route path="/admin/*" element={<AdminRoutes />} />*/}
                     </Route>
 
                     {/* Rutas protegidas para administradores */}
-                    <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                        {/*<Route path="/admin/*" element={<AdminRoutes />} />*/}
+                    <Route element={<AdminLayout />}>
+                        <Route path="/admin/dashboard" element={<AdminDashboard />} />
                     </Route>
                 </Routes>
             </AuthProvider>

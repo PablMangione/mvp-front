@@ -1,0 +1,169 @@
+/* src/components/admin/AdminLayout.css */
+
+/**
+ * Estilos para el layout administrativo.
+ *
+ * La estructura sigue un patrón de layout con sidebar fijo,
+ * similar al de estudiantes pero con colores más profesionales
+ * y sobrios apropiados para un panel administrativo.
+ */
+
+/* Contenedor principal del layout */
+.admin-layout {
+    display: flex;
+    min-height: 100vh;
+    background-color: #f3f4f6; /* Gris claro para contraste con componentes blancos */
+}
+
+/* Área principal de contenido */
+.admin-layout__main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    margin-left: 260px; /* Ancho del sidebar expandido */
+    transition: margin-left 0.3s ease;
+    min-height: 100vh;
+}
+
+/* Ajuste cuando el sidebar está colapsado */
+.admin-layout__main.sidebar-collapsed {
+    margin-left: 80px; /* Ancho del sidebar colapsado */
+}
+
+/* Contenedor del contenido de la página */
+.admin-layout__content {
+    flex: 1;
+    padding: 2rem;
+    max-width: 1600px; /* Más ancho que student para tablas de datos */
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Animación suave al cambiar de página */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Overlay móvil - solo visible cuando el menú está abierto */
+.admin-layout__mobile-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    animation: fadeInOverlay 0.2s ease-out;
+}
+
+@keyframes fadeInOverlay {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/*
+ * Responsive Design
+ *
+ * En tablets y móviles, el sidebar se convierte en un menú
+ * deslizable que se superpone al contenido en lugar de
+ * empujar el layout.
+ */
+
+/* Tablets (landscape) */
+@media (max-width: 1024px) {
+    .admin-layout__main {
+        margin-left: 0; /* Sin margen en dispositivos pequeños */
+    }
+
+    .admin-layout__main.sidebar-collapsed {
+        margin-left: 0;
+    }
+
+    .admin-layout__content {
+        padding: 1.5rem;
+    }
+
+    /* El overlay se vuelve visible en móvil */
+    .admin-layout__mobile-overlay {
+        display: block;
+    }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+    .admin-layout {
+        flex-direction: column;
+    }
+
+    .admin-layout__content {
+        padding: 1rem;
+        max-width: 100%;
+    }
+}
+
+/* Soporte para pantallas muy pequeñas */
+@media (max-width: 480px) {
+    .admin-layout__content {
+        padding: 0.75rem;
+    }
+}
+
+/*
+ * Utilidades para el contenido
+ * Estas clases pueden ser usadas por las páginas hijas
+ */
+
+/* Contenedor para grids de tarjetas */
+.admin-layout__content .admin-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Sección con fondo blanco */
+.admin-layout__content .admin-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* Animación para elementos que aparecen */
+.admin-layout__content > * {
+    animation: contentFadeIn 0.3s ease-out;
+}
+
+@keyframes contentFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estados de carga específicos para admin */
+.admin-layout__loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 400px;
+    color: #6b7280;
+}

@@ -134,7 +134,7 @@ class GroupManagementService extends BaseService {
      * Obtiene todos los grupos de una asignatura específica.
      * Útil para analizar la oferta disponible de una asignatura.
      */
-    async getGroupsBySubject(subjectId: number): Promise<CourseGroupDto[]> {
+    async getGroupsBySubject(subjectId: number | undefined): Promise<CourseGroupDto[]> {
         return this.get<CourseGroupDto[]>(`/subjects/${subjectId}/groups`);
     }
 
