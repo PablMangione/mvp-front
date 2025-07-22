@@ -1,0 +1,85 @@
+/* src/components/common/EmptyState.css */
+
+.empty-state {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    padding: 3rem 1.5rem;
+    text-align: center;
+}
+
+.empty-state__content {
+    max-width: 400px;
+}
+
+.empty-state__icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    opacity: 0.3;
+    filter: grayscale(0.5);
+    user-select: none;
+}
+
+.empty-state__title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #2c3e50;
+    margin: 0 0 0.75rem 0;
+}
+
+.empty-state__message {
+    font-size: 0.9375rem;
+    color: #7f8c8d;
+    line-height: 1.5;
+    margin: 0 0 1.5rem 0;
+}
+
+.empty-state__action {
+    background-color: #3498db;
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.empty-state__action:hover {
+    background-color: #2980b9;
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(52, 152, 219, 0.3);
+}
+
+.empty-state__action:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+/* Variantes */
+.empty-state--small {
+    min-height: 200px;
+    padding: 2rem 1rem;
+}
+
+.empty-state--small .empty-state__icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state--small .empty-state__title {
+    font-size: 1.125rem;
+}
+
+.empty-state--small .empty-state__message {
+    font-size: 0.875rem;
+}
+
+/* Para contenedores con fondo */
+.empty-state--bordered {
+    border: 2px dashed #e0e0e0;
+    border-radius: 8px;
+    background-color: #fafafa;
+}

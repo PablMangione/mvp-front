@@ -100,7 +100,10 @@ export interface CreateGroupDto {
     capacity: number;
 }
 
-export interface UpdateGroupDto extends Partial<CreateGroupDto> {}
+export interface UpdateGroupDto extends Partial<CreateGroupDto> {
+    id: number;
+    status: 'PLANIFICADO' | 'ACTIVO' | 'CERRADO';
+}
 
 export interface UpdateGroupStatusDto {
     status: 'PLANIFICADO' | 'ACTIVO' | 'CERRADO';

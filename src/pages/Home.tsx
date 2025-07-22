@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { LoadingSpinner } from '../components/common/LoadingSpinner';
 
 export const Home: React.FC = () => {
     const { user, loading } = useAuth();
@@ -31,17 +32,5 @@ export const Home: React.FC = () => {
     }, [user, loading, navigate]);
 
     // Mostrar loading mientras se verifica autenticación
-    return (
-        <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            height: '100vh'
-        }}>
-            <div>
-                <h1>ACAInfo</h1>
-                <p>Cargando...</p>
-            </div>
-        </div>
-    );
+    return <LoadingSpinner fullScreen message="Cargando ACAInfo..." />;
 };

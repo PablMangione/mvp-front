@@ -1,0 +1,159 @@
+/* src/components/admin/common/ActionButtons.css */
+
+/* Container */
+.action-buttons {
+    display: flex;
+    gap: 0.375rem;
+}
+
+.action-buttons--horizontal {
+    flex-direction: row;
+}
+
+.action-buttons--vertical {
+    flex-direction: column;
+}
+
+/* Button */
+.action-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+    background-color: transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.action-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.action-button:active {
+    transform: translateY(0);
+    box-shadow: none;
+}
+
+.action-button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.action-button:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+/* Size variants */
+.action-button--small {
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.75rem;
+}
+
+.action-button--medium {
+    width: 2.5rem;
+    height: 2.5rem;
+    font-size: 1rem;
+}
+
+/* Color variants */
+.action-button--primary {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #3498db;
+}
+
+.action-button--primary:hover {
+    background-color: #3498db;
+    color: white;
+}
+
+.action-button--success {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.action-button--success:hover {
+    background-color: #27ae60;
+    color: white;
+}
+
+.action-button--warning {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.action-button--warning:hover {
+    background-color: #f39c12;
+    color: white;
+}
+
+.action-button--danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.action-button--danger:hover {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.action-button--info {
+    background-color: rgba(155, 89, 182, 0.1);
+    color: #9b59b6;
+}
+
+.action-button--info:hover {
+    background-color: #9b59b6;
+    color: white;
+}
+
+.action-button--secondary {
+    background-color: rgba(149, 165, 166, 0.1);
+    color: #7f8c8d;
+}
+
+.action-button--secondary:hover {
+    background-color: #7f8c8d;
+    color: white;
+}
+
+/* Tooltip on hover (optional) */
+.action-button::after {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.25rem 0.5rem;
+    background-color: #212529;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s;
+    margin-bottom: 0.25rem;
+}
+
+.action-button:hover::after {
+    opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .action-buttons--horizontal {
+        gap: 0.25rem;
+    }
+
+    .action-button--small {
+        width: 1.75rem;
+        height: 1.75rem;
+    }
+}

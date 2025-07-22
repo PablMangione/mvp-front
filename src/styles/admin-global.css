@@ -1,0 +1,101 @@
+/* src/styles/admin-global.css */
+
+/* Importar este archivo en AdminLayout o en el index principal */
+
+/* Reset para el área de admin */
+.admin-layout * {
+    box-sizing: border-box;
+}
+
+/* Transiciones globales suaves */
+.admin-layout * {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-duration: 200ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Mejoras de accesibilidad */
+.admin-layout *:focus-visible {
+    outline: 2px solid #3498db;
+    outline-offset: 2px;
+}
+
+/* Animación de entrada para páginas */
+.admin-content > * {
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Estilos para tablas dentro del admin */
+.admin-content table {
+    width: 100%;
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos para cards dentro del admin */
+.admin-content .card {
+    background-color: white;
+    border-radius: 8px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+}
+
+/* Loader para navegación */
+.admin-layout__loader {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background-color: #3498db;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.3s ease;
+    z-index: 9999;
+}
+
+.admin-layout__loader--active {
+    transform: scaleX(1);
+}
+
+/* Mejoras para formularios */
+.admin-content input:focus,
+.admin-content select:focus,
+.admin-content textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+/* Estado de error */
+.admin-content .error-state {
+    background-color: #fee;
+    border: 1px solid #fcc;
+    color: #c33;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}
+
+/* Estado de éxito */
+.admin-content .success-state {
+    background-color: #efe;
+    border: 1px solid #cfc;
+    color: #3a3;
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+}

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import './Login.css';
 
 export const Login: React.FC = () => {
@@ -28,7 +29,7 @@ export const Login: React.FC = () => {
                     navigate('/admin/dashboard');
                     break;
                 default:
-                    console.error('Unknown role:', user.role); // Debug
+                    console.error('Unknown role:', user.role);
             }
         }
     }, [user, navigate, authLoading]);
@@ -69,7 +70,7 @@ export const Login: React.FC = () => {
             <div className="login-container">
                 <div className="login-card">
                     <h1>ACAInfo</h1>
-                    <p style={{ textAlign: 'center' }}>Verificando sesión...</p>
+                    <LoadingSpinner size="medium" message="Verificando sesión..." />
                 </div>
             </div>
         );
@@ -121,7 +122,14 @@ export const Login: React.FC = () => {
                         className="submit-button"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                        {isLoading ? (
+                            <>
+                                <LoadingSpinner size="small" className="loading-spinner--inline" />
+                                <span>Iniciando sesión...</span>
+                            </>
+                        ) : (
+                            'Iniciar Sesión'
+                        )}
                     </button>
                 </form>
 

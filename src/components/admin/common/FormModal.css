@@ -1,0 +1,245 @@
+/* src/components/admin/common/FormModal.css */
+
+/* Backdrop */
+.form-modal__backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+    animation: fadeIn 0.2s ease-out;
+}
+
+/* Modal Container */
+.form-modal {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Size variants */
+.form-modal--small {
+    max-width: 400px;
+}
+
+.form-modal--medium {
+    max-width: 600px;
+}
+
+.form-modal--large {
+    max-width: 800px;
+}
+
+/* Header */
+.form-modal__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.form-modal__title {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #212529;
+}
+
+.form-modal__close {
+    background: none;
+    border: none;
+    font-size: 2rem;
+    line-height: 1;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 4px;
+    transition: all 0.2s;
+}
+
+.form-modal__close:hover {
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+.form-modal__close:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* Form */
+.form-modal__form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+}
+
+/* Body */
+.form-modal__body {
+    flex: 1;
+    padding: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Footer */
+.form-modal__footer {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    padding: 1.5rem;
+    border-top: 1px solid #e9ecef;
+    background-color: #f8f9fa;
+}
+
+/* Buttons */
+.form-modal__button {
+    padding: 0.5rem 1.25rem;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-modal__button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.form-modal__button--cancel {
+    background-color: #e9ecef;
+    color: #495057;
+}
+
+.form-modal__button--cancel:hover:not(:disabled) {
+    background-color: #dee2e6;
+    color: #212529;
+}
+
+.form-modal__button--submit {
+    background-color: #3498db;
+    color: white;
+}
+
+.form-modal__button--submit:hover:not(:disabled) {
+    background-color: #2980b9;
+}
+
+/* Spinner */
+.form-modal__spinner {
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+/* Form elements within modal */
+.form-modal__body .form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-modal__body .form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-modal__body label {
+    display: block;
+    font-weight: 500;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    font-size: 0.875rem;
+}
+
+.form-modal__body input,
+.form-modal__body select,
+.form-modal__body textarea {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.form-modal__body input:focus,
+.form-modal__body select:focus,
+.form-modal__body textarea:focus {
+    outline: none;
+    border-color: #3498db;
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+}
+
+.form-modal__body .form-error {
+    color: #dc3545;
+    font-size: 0.8125rem;
+    margin-top: 0.25rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* Responsive */
+@media (max-width: 576px) {
+    .form-modal__backdrop {
+        padding: 0;
+    }
+
+    .form-modal {
+        max-height: 100vh;
+        border-radius: 0;
+    }
+
+    .form-modal--small,
+    .form-modal--medium,
+    .form-modal--large {
+        max-width: 100%;
+    }
+}

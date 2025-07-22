@@ -1,0 +1,93 @@
+/* src/components/admin/common/StatusBadge.css */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+/* Icon */
+.status-badge__icon {
+    font-size: 0.875rem;
+    line-height: 1;
+}
+
+/* Text */
+.status-badge__text {
+    line-height: 1;
+}
+
+/* Variants */
+.status-badge--primary {
+    background-color: rgba(52, 152, 219, 0.1);
+    color: #2980b9;
+}
+
+.status-badge--success {
+    background-color: rgba(39, 174, 96, 0.1);
+    color: #27ae60;
+}
+
+.status-badge--warning {
+    background-color: rgba(243, 156, 18, 0.1);
+    color: #f39c12;
+}
+
+.status-badge--danger {
+    background-color: rgba(231, 76, 60, 0.1);
+    color: #e74c3c;
+}
+
+.status-badge--info {
+    background-color: rgba(155, 89, 182, 0.1);
+    color: #9b59b6;
+}
+
+.status-badge--secondary {
+    background-color: rgba(149, 165, 166, 0.1);
+    color: #7f8c8d;
+}
+
+/* Hover effects */
+.status-badge--primary:hover {
+    background-color: rgba(52, 152, 219, 0.2);
+}
+
+.status-badge--success:hover {
+    background-color: rgba(39, 174, 96, 0.2);
+}
+
+.status-badge--warning:hover {
+    background-color: rgba(243, 156, 18, 0.2);
+}
+
+.status-badge--danger:hover {
+    background-color: rgba(231, 76, 60, 0.2);
+}
+
+.status-badge--info:hover {
+    background-color: rgba(155, 89, 182, 0.2);
+}
+
+.status-badge--secondary:hover {
+    background-color: rgba(149, 165, 166, 0.2);
+}
+
+/* Size variants */
+.status-badge--small {
+    font-size: 0.625rem;
+    padding: 0.125rem 0.5rem;
+}
+
+.status-badge--large {
+    font-size: 0.875rem;
+    padding: 0.375rem 1rem;
+}

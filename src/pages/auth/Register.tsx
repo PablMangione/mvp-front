@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import './Register.css';
 
 export const Register: React.FC = () => {
     const navigate = useNavigate();
-    const { register, user, error, clearError } = useAuth();
+    const { register, user, error, clearError, loading: authLoading } = useAuth();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -20,10 +21,10 @@ export const Register: React.FC = () => {
 
     useEffect(() => {
         // Si ya está autenticado, redirigir
-        if (user) {
+        if (user && !authLoading) {
             navigate('/student/dashboard');
         }
-    }, [user, navigate]);
+    }, [user, navigate, authLoading]);
 
     useEffect(() => {
         // Limpiar errores al desmontar
@@ -104,6 +105,18 @@ export const Register: React.FC = () => {
             setIsLoading(false);
         }
     };
+
+    // Mostrar loading mientras verifica la autenticación
+    if (authLoading) {
+        return (
+            <div className="register-container">
+                <div className="register-card">
+                    <h1>ACAInfo</h1>
+                    <LoadingSpinner size="medium" message="Verificando sesión..." />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="register-container">
@@ -212,7 +225,14 @@ export const Register: React.FC = () => {
                         className="submit-button"
                         disabled={isLoading}
                     >
-                        {isLoading ? 'Registrando...' : 'Registrarse'}
+                        {isLoading ? (
+                            <>
+                                <LoadingSpinner size="small" className="loading-spinner--inline" />
+                                <span>Registrando...</span>
+                            </>
+                        ) : (
+                            'Registrarse'
+                        )}
                     </button>
                 </form>
 

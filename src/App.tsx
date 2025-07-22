@@ -1,7 +1,7 @@
 // src/App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthProvider';
-import { ProtectedRoute } from './components/common/ProtectedRoute';
+import { ProtectedRoute } from './components/common';
 import { StudentLayout } from './components/student/StudentLayout';
 import { Home } from './pages/Home';
 import { Login } from './pages/auth/Login';
@@ -11,6 +11,7 @@ import { Profile } from './pages/student/Profile';
 import { Enrollments } from './pages/student/Enrollment';
 import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
+import {AdminRoutes} from "./routes/AdminRoutes.tsx";
 import './App.css';
 
 function App() {
@@ -44,7 +45,7 @@ function App() {
 
                     {/* Rutas protegidas para administradores */}
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                        {/* <Route path="/admin/dashboard" element={<AdminDashboard />} /> */}
+                        <Route path="/admin/*" element={<AdminRoutes />} />
                     </Route>
                 </Routes>
             </AuthProvider>

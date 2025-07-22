@@ -87,6 +87,10 @@
     font-weight: 500;
     cursor: pointer;
     transition: background-color 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 .submit-button:hover:not(:disabled) {
@@ -120,4 +124,19 @@
 
 .register-footer a:hover {
     text-decoration: underline;
+}
+
+/* Soporte para LoadingSpinner inline */
+.submit-button .loading-spinner--inline {
+    margin: 0;
+    padding: 0;
+}
+
+.submit-button .loading-spinner--inline .loading-spinner {
+    width: 16px;
+    height: 16px;
+}
+
+.submit-button .loading-spinner--inline .loading-spinner__circle {
+    border-color: white;
 }
