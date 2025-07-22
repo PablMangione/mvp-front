@@ -11,7 +11,6 @@ import { Profile } from './pages/student/Profile';
 import { Enrollments } from './pages/student/Enrollment';
 import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
-import {AdminRoutes} from "./routes/AdminRoutes.tsx";
 import './App.css';
 
 function App() {
@@ -45,7 +44,7 @@ function App() {
 
                     {/* Rutas protegidas para administradores */}
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
-                        <Route path="/admin/*" element={<AdminRoutes />} />
+                        {/*<Route path="/admin/*" element={<AdminRoutes />} />*/}
                     </Route>
                 </Routes>
             </AuthProvider>
