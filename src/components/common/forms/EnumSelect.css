@@ -1,0 +1,135 @@
+/* src/components/common/forms/EnumSelect.module.css */
+
+/**
+ * Estilos para el componente EnumSelect.
+ * Diseñado para ser consistente con el resto de la aplicación
+ * y proporcionar una experiencia de usuario clara y accesible.
+ */
+
+/* Contenedor principal del componente */
+.enum-select-container {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+/* Estilo para la etiqueta del campo */
+.enum-select-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Indicador de campo requerido */
+.enum-select-required {
+    color: #ef4444;
+    font-weight: 700;
+}
+
+/* Select principal - Estado normal */
+.enum-select {
+    width: 100%;
+    padding: 0.625rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.375rem;
+    background-color: white;
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    color: #111827;
+    transition: all 0.15s ease-in-out;
+    cursor: pointer;
+
+    /* Eliminar estilos por defecto del navegador */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    /* Añadir flecha personalizada */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3E%3Cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3E%3C/svg%3E");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+/* Estado hover del select */
+.enum-select:hover:not(:disabled) {
+    border-color: #9ca3af;
+}
+
+/* Estado focus del select */
+.enum-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Estado error del select */
+.enum-select--error {
+    border-color: #ef4444;
+}
+
+.enum-select--error:focus {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+/* Estado deshabilitado del select */
+.enum-select--disabled,
+.enum-select:disabled {
+    background-color: #f9fafb;
+    color: #6b7280;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+/* Mensaje de error */
+.enum-select-error {
+    font-size: 0.75rem;
+    color: #ef4444;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+/* Estilos para la opción placeholder */
+.enum-select option[value=""] {
+    color: #9ca3af;
+}
+
+/* Responsive - Ajustes para móviles */
+@media (max-width: 640px) {
+    .enum-select {
+        font-size: 1rem; /* Tamaño mayor en móviles para mejor legibilidad */
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Modo oscuro (si tu aplicación lo soporta) */
+@media (prefers-color-scheme: dark) {
+    .enum-select-label {
+        color: #e5e7eb;
+    }
+
+    .enum-select {
+        background-color: #1f2937;
+        border-color: #374151;
+        color: #f3f4f6;
+    }
+
+    .enum-select:hover:not(:disabled) {
+        border-color: #4b5563;
+    }
+
+    .enum-select--disabled,
+    .enum-select:disabled {
+        background-color: #111827;
+        color: #6b7280;
+    }
+}
