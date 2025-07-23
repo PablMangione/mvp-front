@@ -1,0 +1,638 @@
+/* src/components/admin/groups/GroupList.css */
+
+/**
+ * Estilos para el componente de lista de grupos.
+ * Mantiene consistencia con el diseño del panel administrativo
+ * mientras añade elementos específicos para la gestión de grupos.
+ */
+
+/* Contenedor principal */
+.group-list {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    padding: 2rem;
+    margin: 0 auto;
+    max-width: 1400px;
+}
+
+/* ========== Header ========== */
+.group-list__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 2px solid #e5e7eb;
+}
+
+.group-list__header-content {
+    flex: 1;
+}
+
+.group-list__title {
+    font-size: 1.875rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem 0;
+}
+
+.group-list__subtitle {
+    font-size: 1rem;
+    color: #6b7280;
+    margin: 0;
+}
+
+.group-list__header-actions {
+    display: flex;
+    gap: 1rem;
+}
+
+/* ========== Mensajes de feedback ========== */
+.group-list__success-message {
+    background-color: #d1fae5;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-1rem);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.success-icon {
+    font-size: 1.25rem;
+}
+
+.group-list__success-message span:nth-child(2) {
+    flex: 1;
+    color: #065f46;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.success-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #065f46;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
+}
+
+.success-close:hover {
+    opacity: 1;
+}
+
+/* ========== Tarjetas de resumen ========== */
+.group-list__summary {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.summary-card {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.summary-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card__value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #1f2937;
+    line-height: 1;
+}
+
+.summary-card__label {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-top: 0.5rem;
+}
+
+/* ========== Estados de carga y error ========== */
+.group-list__loading,
+.group-list__error {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    text-align: center;
+}
+
+.loading-spinner {
+    width: 48px;
+    height: 48px;
+    border: 4px solid #e5e7eb;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.group-list__error p {
+    color: #ef4444;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+}
+
+/* ========== Sección de búsqueda y filtros ========== */
+.group-list__filters {
+    background-color: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Barra de búsqueda */
+.group-list__search {
+    position: relative;
+    margin-bottom: 1rem;
+}
+
+.search-input {
+    width: 100%;
+    padding: 0.75rem 2.5rem 0.75rem 1rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6b7280;
+    pointer-events: none;
+}
+
+/* Controles de filtros */
+.group-list__filter-controls {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.filter-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+}
+
+.filter-select {
+    padding: 0.5rem 2rem 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    background-color: white;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b7280' d='M5.293 8.293a1 1 0 0 0 1.414 0l3-3a1 1 0 0 0-1.414-1.414L6 6.172 3.707 3.879a1 1 0 0 0-1.414 1.414l3 3z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1.5rem;
+    appearance: none;
+    cursor: pointer;
+    transition: border-color 0.2s ease;
+}
+
+.filter-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* Información de resultados */
+.group-list__results-info {
+    margin-top: 1rem;
+    font-size: 0.875rem;
+    color: #6b7280;
+    text-align: center;
+}
+
+/* ========== Tabla ========== */
+.group-list__table-container {
+    overflow-x: auto;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.group-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.875rem;
+}
+
+.group-table th {
+    background-color: #f9fafb;
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    color: #374151;
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.group-table th.sortable {
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s ease;
+}
+
+.group-table th.sortable:hover {
+    background-color: #f3f4f6;
+}
+
+.sort-indicator {
+    color: #3b82f6;
+    font-size: 0.75rem;
+    margin-left: 0.25rem;
+}
+
+.group-table td {
+    padding: 1rem;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+.group-table tbody tr {
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.group-table tbody tr:hover {
+    background-color: #f9fafb;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transform: translateX(2px);
+}
+
+.group-table__id {
+    font-weight: 500;
+    color: #6b7280;
+}
+
+.group-table__subject {
+    font-weight: 500;
+    color: #111827;
+}
+
+.group-table__teacher {
+    color: #374151;
+}
+
+.text-warning {
+    color: #f59e0b;
+    font-style: italic;
+}
+
+/* ========== Badges de estado y tipo ========== */
+.status-badge,
+.type-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* Estados */
+.status-badge--planned {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.status-badge--active {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge--closed {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+.status-badge--default {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* Tipos */
+.type-badge--regular {
+    background-color: #e0e7ff;
+    color: #4338ca;
+}
+
+.type-badge--intensive {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+.type-badge--default {
+    background-color: #f3f4f6;
+    color: #6b7280;
+}
+
+/* ========== Información de capacidad ========== */
+.capacity-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.capacity-info__text {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.occupancy-bar {
+    width: 100px;
+    height: 6px;
+    background-color: #e5e7eb;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.occupancy-bar__fill {
+    height: 100%;
+    transition: width 0.3s ease;
+}
+
+.occupancy-bar__fill--low {
+    background-color: #10b981;
+}
+
+.occupancy-bar__fill--medium {
+    background-color: #3b82f6;
+}
+
+.occupancy-bar__fill--high {
+    background-color: #f59e0b;
+}
+
+.occupancy-bar__fill--full {
+    background-color: #ef4444;
+}
+
+/* ========== Precio ========== */
+.group-table__price {
+    font-weight: 500;
+    color: #059669;
+}
+
+/* ========== Acciones ========== */
+.group-table__actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Tooltips mejorados para los botones */
+.btn[title] {
+    position: relative;
+}
+
+.btn[title]:hover::before {
+    content: attr(title);
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.25rem 0.5rem;
+    background-color: #1f2937;
+    color: white;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    white-space: nowrap;
+    margin-bottom: 0.25rem;
+    z-index: 1000;
+    pointer-events: none;
+    animation: tooltipIn 0.2s ease-out;
+}
+
+.btn[title]:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 4px solid transparent;
+    border-top-color: #1f2937;
+    margin-bottom: -0.25rem;
+    z-index: 1000;
+    pointer-events: none;
+    animation: tooltipIn 0.2s ease-out;
+}
+
+@keyframes tooltipIn {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(0.25rem);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+/* Mejorar el hover de los botones de acción */
+.btn--secondary:hover:not(:disabled) {
+    background-color: #e5e7eb;
+    transform: scale(1.05);
+}
+
+.btn--danger:hover:not(:disabled) {
+    background-color: #fecaca;
+    transform: scale(1.05);
+}
+
+/* ========== Estado vacío ========== */
+.group-list__empty {
+    text-align: center;
+    padding: 3rem;
+}
+
+.group-list__empty p {
+    color: #6b7280;
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* ========== Botones ========== */
+.btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.625rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn:disabled:hover {
+    transform: none;
+    box-shadow: none;
+}
+
+.btn--primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn--primary:hover:not(:disabled) {
+    background-color: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.btn--secondary {
+    background-color: #f3f4f6;
+    color: #374151;
+    border-color: #e5e7eb;
+}
+
+.btn--secondary:hover:not(:disabled) {
+    background-color: #e5e7eb;
+}
+
+.btn--danger {
+    background-color: #fee2e2;
+    color: #991b1b;
+}
+
+.btn--danger:hover:not(:disabled) {
+    background-color: #fecaca;
+}
+
+.btn--sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+}
+
+.btn__icon {
+    font-size: 1.25rem;
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 1024px) {
+    .group-list__filter-controls {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .group-list {
+        padding: 1rem;
+    }
+
+    .group-list__header {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .group-list__header-actions {
+        width: 100%;
+    }
+
+    .group-list__header-actions .btn {
+        width: 100%;
+    }
+
+    .group-list__summary {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    /* Filtros responsive */
+    .group-list__filters {
+        padding: 1rem;
+    }
+
+    .group-list__filter-controls {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .filter-select {
+        width: 100%;
+    }
+
+    /* Tabla responsive */
+    .group-table {
+        font-size: 0.75rem;
+    }
+
+    .group-table th,
+    .group-table td {
+        padding: 0.5rem;
+    }
+
+    .occupancy-bar {
+        width: 60px;
+    }
+
+    .group-table__actions {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .btn--sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
+    }
+}
