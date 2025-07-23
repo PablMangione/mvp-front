@@ -7,7 +7,7 @@ import type {
     UpdateGroupStatusDto,
     AssignTeacherDto,
     DeleteResponseDto,
-    CreateGroupSessionDto, GroupSessionDto
+    CreateGroupSessionDto, GroupSessionDto, StudentDto
 } from '../../types/admin.types';
 
 /**
@@ -136,6 +136,20 @@ class GroupManagementService extends BaseService {
      */
     async getGroupsBySubject(subjectId: number | undefined): Promise<CourseGroupDto[]> {
         return this.get<CourseGroupDto[]>(`/subjects/${subjectId}/groups`);
+    }
+
+    /**
+     * Obtiene todos los estudiantes de un grupo.
+     */
+    async getStudentsByGroup(groupId: number | undefined): Promise<StudentDto[]> {
+        return this.get<StudentDto[]>(`/groups/${groupId}/students`);
+    }
+
+    async updateGroupSession(
+        groupId: number,
+        data: GroupSessionDto
+    ): Promise<CourseGroupDto> {
+        return this.put<CourseGroupDto>(`/groups/${groupId}/sessions`, data);
     }
 
     /**

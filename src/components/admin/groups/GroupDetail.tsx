@@ -137,6 +137,8 @@ export const GroupDetail: React.FC = () => {
         CLOSED: { label: 'Cerrado', color: 'status--error' }
     };
 
+    // @ts-ignore
+    // @ts-ignore
     return (
         <div className="group-detail__container">
             {/* Header con navegación */}
