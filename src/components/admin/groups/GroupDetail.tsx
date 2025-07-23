@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { groupManagementService } from '../../../services/admin';
+import { WeeklySchedule, type ScheduleSession } from '../../common/WeeklySchedule';
 import type { CourseGroupDto, GroupSessionDto } from '../../../types/admin.types';
 import './GroupDetail.css';
 
@@ -11,7 +12,7 @@ import './GroupDetail.css';
  * Muestra toda la información relevante del grupo incluyendo:
  * - Información general (asignatura, profesor, estado)
  * - Estadísticas (capacidad, inscripciones)
- * - Horario semanal con las sesiones
+ * - Horario semanal con las sesiones usando el componente reutilizable
  * - Acciones disponibles
  */
 export const GroupDetail: React.FC = () => {
@@ -73,154 +74,157 @@ export const GroupDetail: React.FC = () => {
         }
     };
 
-    // Formatear estado
-    const getStatusBadge = (status: string) => {
-        const statusMap: Record<string, { text: string; className: string }> = {
-            'PLANNED': { text: 'Planificado', className: 'badge badge--planned' },
-            'ACTIVE': { text: 'Activo', className: 'badge badge--active' },
-            'CLOSED': { text: 'Cerrado', className: 'badge badge--closed' }
-        };
-
-        const statusInfo = statusMap[status] || { text: status, className: 'badge' };
-        return <span className={statusInfo.className}>{statusInfo.text}</span>;
+    // Ocultar horario
+    const hideSchedule = () => {
+        setShowSchedule(false);
     };
 
-    // Formatear tipo
-    const getTypeBadge = (type: string) => {
-        const typeMap: Record<string, { text: string; className: string }> = {
-            'REGULAR': { text: 'Regular', className: 'badge badge--regular' },
-            'INTENSIVE': { text: 'Intensivo', className: 'badge badge--intensive' }
-        };
-
-        const typeInfo = typeMap[type] || { text: type, className: 'badge' };
-        return <span className={typeInfo.className}>{typeInfo.text}</span>;
+    // Transformar sesiones al formato del componente WeeklySchedule
+    const transformSessions = (sessions: GroupSessionDto[]): ScheduleSession[] => {
+        return sessions.map(session => ({
+            id: session.id,
+            dayOfWeek: session.dayOfWeek,
+            startTime: session.startTime,
+            endTime: session.endTime,
+            classroom: session.classroom,
+            title: group?.subjectName,
+            subtitle: group?.teacherName
+        }));
     };
 
-    // Calcular porcentaje de ocupación
-    const getOccupancyPercentage = () => {
-        if (!group) return 0;
-        const enrolled = group.enrolledStudents || 0;
-        const max = group.maxCapacity || 1;
-        return Math.round((enrolled / max) * 100);
+    // Manejar click en sesión
+    const handleSessionClick = (session: ScheduleSession) => {
+        // Aquí puedes agregar lógica para editar o ver detalles de la sesión
+        console.log('Sesión clickeada:', session);
+        // navigate(`/admin/groups/${id}/sessions/${session.id}/edit`);
     };
 
-    // Estado de carga
+    // Estados de carga
     if (loadingGroup) {
         return (
-            <div className="group-detail">
-                <div className="group-detail__loading">
-                    <div className="spinner"></div>
-                    <p>Cargando información del grupo...</p>
-                </div>
+            <div className="group-detail__container">
+                <div className="loading-spinner">Cargando información del grupo...</div>
             </div>
         );
     }
 
-    // Estado de error
     if (groupError || !group) {
         return (
-            <div className="group-detail">
-                <div className="group-detail__error">
-                    <p>{groupError || 'Grupo no encontrado'}</p>
-                    <button
-                        onClick={() => navigate('/admin/groups')}
-                        className="btn btn--primary"
-                    >
-                        Volver a la lista
-                    </button>
-                </div>
+            <div className="group-detail__container">
+                <div className="error-message">{groupError || 'Grupo no encontrado'}</div>
+                <button onClick={() => navigate('/admin/groups')} className="btn btn--secondary">
+                    Volver a la lista
+                </button>
             </div>
         );
     }
 
+    // Calcular porcentaje de ocupación
+    const occupancy = group.maxCapacity > 0
+        ? Math.round((group.enrolledStudents / group.maxCapacity) * 100)
+        : 0;
+
+    // Mapeo de tipos
+    const typeLabels = {
+        REGULAR: 'Regular',
+        INTENSIVE: 'Intensivo'
+    };
+
+    // Mapeo de estados
+    const statusConfig = {
+        PLANNED: { label: 'Planificado', color: 'status--warning' },
+        ACTIVE: { label: 'Activo', color: 'status--success' },
+        CLOSED: { label: 'Cerrado', color: 'status--error' }
+    };
+
     return (
-        <div className="group-detail">
+        <div className="group-detail__container">
             {/* Header con navegación */}
             <div className="group-detail__header">
-                <div className="group-detail__breadcrumb">
-                    <button
-                        onClick={() => navigate('/admin/groups')}
-                        className="breadcrumb__link"
-                    >
-                        ← Grupos
-                    </button>
-                    <span className="breadcrumb__separator">/</span>
-                    <span className="breadcrumb__current">Grupo #{group.id}</span>
-                </div>
-
-                <div className="group-detail__actions">
-                    <button
-                        onClick={() => navigate(`/admin/groups/${group.id}/edit`)}
-                        className="btn btn--secondary"
-                    >
-                        ✏️ Editar
-                    </button>
-                </div>
-            </div>
-
-            {/* Información principal */}
-            <div className="group-detail__main">
-                <h1 className="group-detail__title">{group.subjectName}</h1>
-                <p className="group-detail__subtitle">Grupo #{group.id}</p>
+                <button
+                    onClick={() => navigate('/admin/groups')}
+                    className="btn btn--ghost"
+                >
+                    ← Volver a grupos
+                </button>
+                <h1>Detalles del Grupo</h1>
             </div>
 
             {/* Grid de información */}
             <div className="group-detail__grid">
-                {/* Información general */}
+                {/* Información básica */}
                 <div className="info-card">
-                    <h2 className="info-card__title">Información General</h2>
-                    <div className="info-card__content">
-                        <div className="info-row">
-                            <span className="info-label">Estado:</span>
-                            <span>{getStatusBadge(group.status)}</span>
+                    <h2>Información General</h2>
+                    <div className="info-grid">
+                        <div className="info-item">
+                            <span className="info-label">Asignatura:</span>
+                            <span className="info-value">{group.subjectName}</span>
                         </div>
-                        <div className="info-row">
-                            <span className="info-label">Tipo:</span>
-                            <span>{getTypeBadge(group.type)}</span>
-                        </div>
-                        <div className="info-row">
+                        <div className="info-item">
                             <span className="info-label">Profesor:</span>
-                            <span className={!group.teacherId ? 'text-warning' : ''}>
+                            <span className={`info-value ${!group.teacherName ? 'text-warning' : ''}`}>
                                 {group.teacherName || 'Sin asignar'}
                             </span>
                         </div>
-                        <div className="info-row">
+                        <div className="info-item">
+                            <span className="info-label">Tipo:</span>
+                            <span className="info-value">{typeLabels[group.type]}</span>
+                        </div>
+                        <div className="info-item">
+                            <span className="info-label">Estado:</span>
+                            <span className={`status-badge ${statusConfig[group.status].color}`}>
+                                {statusConfig[group.status].label}
+                            </span>
+                        </div>
+                        <div className="info-item">
                             <span className="info-label">Precio:</span>
-                            <span className="text-success">${group.price || 0}</span>
+                            <span className="info-value text-success">${group.price}</span>
                         </div>
                     </div>
                 </div>
 
-                {/* Estadísticas de capacidad */}
+                {/* Estadísticas */}
                 <div className="info-card">
-                    <h2 className="info-card__title">Capacidad</h2>
-                    <div className="info-card__content">
-                        <div className="capacity-visual">
-                            <div className="capacity-number">
-                                {group.enrolledStudents || 0} / {group.maxCapacity || 0}
-                            </div>
-                            <div className="capacity-label">Estudiantes inscritos</div>
-                            <div className="capacity-bar">
+                    <h2>Estadísticas</h2>
+                    <div className="stats-grid">
+                        <div className="stat-item">
+                            <div className="stat-label">Estudiantes inscritos</div>
+                            <div className="stat-value">{group.enrolledStudents}</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-label">Capacidad máxima</div>
+                            <div className="stat-value">{group.maxCapacity}</div>
+                        </div>
+                        <div className="stat-item">
+                            <div className="stat-label">Ocupación</div>
+                            <div className="stat-value">{occupancy}%</div>
+                            <div className="occupancy-bar">
                                 <div
-                                    className="capacity-bar__fill"
-                                    style={{ width: `${getOccupancyPercentage()}%` }}
+                                    className="occupancy-bar__fill"
+                                    style={{ width: `${occupancy}%` }}
                                 />
                             </div>
-                            <div className="capacity-percentage">
-                                {getOccupancyPercentage()}% ocupado
-                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Acciones rápidas */}
+                {/* Acciones */}
                 <div className="info-card">
-                    <h2 className="info-card__title">Acciones Rápidas</h2>
-                    <div className="info-card__content">
+                    <h2>Acciones</h2>
+                    <div className="actions-grid">
                         <button
                             className="action-btn"
-                            disabled={group.status !== 'PLANNED'}
-                            title={group.status !== 'PLANNED' ? 'Solo grupos planificados' : ''}
+                            onClick={() => navigate(`/admin/groups/${group.id}/edit`)}
+                        >
+                            ✏️ Editar Grupo
+                        </button>
+                        <button
+                            className="action-btn"
+                            disabled={group.status !== 'PLANNED' || !group.teacherId}
+                            title={
+                                group.status !== 'PLANNED' ? 'Solo grupos planificados' :
+                                    !group.teacherId ? 'Asigna un profesor primero' : ''
+                            }
                         >
                             🚀 Activar Grupo
                         </button>
@@ -251,13 +255,20 @@ export const GroupDetail: React.FC = () => {
             <div className="group-detail__schedule-section">
                 <div className="schedule-header">
                     <h2>Horario Semanal</h2>
-                    {!showSchedule && (
+                    {!showSchedule ? (
                         <button
                             onClick={loadSessions}
                             className="btn btn--primary"
                             disabled={loadingSessions}
                         >
                             {loadingSessions ? 'Cargando...' : '📅 Ver Horario'}
+                        </button>
+                    ) : (
+                        <button
+                            onClick={hideSchedule}
+                            className="btn btn--secondary"
+                        >
+                            👁️‍🗨️ Ocultar Horario
                         </button>
                     )}
                 </div>
@@ -279,112 +290,18 @@ export const GroupDetail: React.FC = () => {
                                 </button>
                             </div>
                         ) : (
-                            <WeeklyScheduleGrid
-                                sessions={sessions}
-                                groupName={group.subjectName}
-                                teacherName={group.teacherName}
+                            <WeeklySchedule
+                                sessions={transformSessions(sessions)}
+                                startHour={8}
+                                endHour={22}
+                                showWeekends={true}
+                                height="600px"
+                                onSessionClick={handleSessionClick}
                             />
                         )}
                     </>
                 )}
             </div>
-        </div>
-    );
-};
-
-/**
- * Componente interno para mostrar el horario semanal.
- * Específico para la vista de grupos.
- */
-const WeeklyScheduleGrid: React.FC<{
-    sessions: GroupSessionDto[];
-    groupName: string;
-    teacherName?: string;
-}> = ({ sessions, groupName, teacherName }) => {
-    const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-    const hours = [];
-
-    // Generar horas de 8:00 a 22:00
-    for (let h = 8; h < 22; h++) {
-        hours.push(`${h}:00`);
-        hours.push(`${h}:30`);
-    }
-
-    // Mapeo de días
-    const dayMap: Record<string, number> = {
-        'MONDAY': 0, 'TUESDAY': 1, 'WEDNESDAY': 2, 'THURSDAY': 3,
-        'FRIDAY': 4, 'SATURDAY': 5, 'SUNDAY': 6
-    };
-
-    // Convertir tiempo a minutos
-    const timeToMinutes = (time: string) => {
-        const [h, m] = time.split(':').map(Number);
-        return h * 60 + m;
-    };
-
-    // Calcular posición de una sesión
-    const getSessionPosition = (session: GroupSessionDto) => {
-        const dayIndex = dayMap[session.dayOfWeek] || 0;
-        const startMinutes = timeToMinutes(session.startTime);
-        const endMinutes = timeToMinutes(session.endTime);
-        const baseMinutes = 8 * 60; // 8:00 AM
-
-        const startRow = Math.floor((startMinutes - baseMinutes) / 30) + 2;
-        const duration = endMinutes - startMinutes;
-        const rowSpan = Math.ceil(duration / 30);
-
-        return {
-            gridColumn: dayIndex + 2,
-            gridRow: `${startRow} / span ${rowSpan}`
-        };
-    };
-
-    return (
-        <div className="schedule-grid">
-            {/* Esquina vacía */}
-            <div className="schedule-grid__corner"></div>
-
-            {/* Headers de días */}
-            {days.map(day => (
-                <div key={day} className="schedule-grid__day-header">
-                    {day}
-                </div>
-            ))}
-
-            {/* Columna de horas */}
-            {hours.map((hour, idx) => (
-                <div
-                    key={hour}
-                    className={`schedule-grid__time ${idx % 2 === 0 ? 'time--hour' : 'time--half'}`}
-                >
-                    {hour}
-                </div>
-            ))}
-
-            {/* Celdas vacías */}
-            {hours.map((_, rowIdx) =>
-                days.map((_, colIdx) => (
-                    <div
-                        key={`${rowIdx}-${colIdx}`}
-                        className={`schedule-grid__cell ${rowIdx % 2 === 0 ? 'cell--hour' : ''}`}
-                    />
-                ))
-            )}
-
-            {/* Sesiones */}
-            {sessions.map(session => (
-                <div
-                    key={session.id}
-                    className="schedule-grid__session"
-                    style={getSessionPosition(session)}
-                    title={`${groupName} - ${session.classroom}`}
-                >
-                    <div className="session-time">
-                        {session.startTime.substring(0, 5)} - {session.endTime.substring(0, 5)}
-                    </div>
-                    <div className="session-room">📍 {session.classroom}</div>
-                </div>
-            ))}
         </div>
     );
 };
