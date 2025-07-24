@@ -700,7 +700,10 @@ export const GroupList: React.FC = () => {
                                 <td className="group-table__price">${group.price || 0}</td>
                                 <td className="group-table__actions">
                                     <button
-                                        onClick={() => navigate(`/admin/groups/${group.id}`)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/admin/groups/${group.id}`);
+                                        }}
                                         className="btn btn--sm btn--secondary"
                                         title="Ver detalles del grupo"
                                         aria-label={`Ver detalles del grupo ${group.subjectName}`}
@@ -708,15 +711,22 @@ export const GroupList: React.FC = () => {
                                         👁️
                                     </button>
                                     <button
-                                        onClick={() => navigate(`/admin/groups/${group.id}/edit`)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            navigate(`/admin/groups/${group.id}/edit`);
+                                        }}
                                         className="btn btn--sm btn--secondary"
                                         title="Editar grupo"
                                         aria-label={`Editar grupo ${group.subjectName}`}
+                                        disabled={group.status !== 'PLANNED'}
                                     >
                                         ✏️
                                     </button>
                                     <button
-                                        onClick={() => handleDeleteClick(group)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteClick(group);
+                                        }}
                                         className="btn btn--sm btn--danger"
                                         title={
                                             group.status !== 'PLANNED'

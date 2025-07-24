@@ -15,6 +15,6 @@
 
 
 export { GroupList } from './GroupList';
-// export { GroupForm } from './GroupForm';
+export { GroupForm } from './GroupForm';
 export { DeleteConfirmationModal } from './DeleteConfirmationModal';
 export { GroupDetail} from './GroupDetail';

@@ -194,6 +194,20 @@ class GroupManagementService extends BaseService {
         return this.get<GroupSessionDto[]>
         (`/weekly-schedule/create-group?teacherId=${teacherId}&classroom=${encodeURIComponent(classroom)}`);
     }
+    /**
+     * Actualiza la información de un grupo existente.
+     *
+     * Permite modificar:
+     * - Tipo de grupo (REGULAR, INTENSIVE, etc.)
+     * - Precio
+     * - Profesor asignado
+     * - Capacidad máxima
+     *
+     * El endpoint espera un CourseGroupDto completo con los nuevos valores.
+     */
+    async updateGroup(groupId: number, data: CourseGroupDto): Promise<CourseGroupDto> {
+        return this.put<CourseGroupDto>(`/groups/${groupId}`, data);
+    }
 
 }
 

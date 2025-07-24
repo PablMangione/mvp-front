@@ -14,7 +14,7 @@ import { Subjects } from './pages/student/Subjects';
 import { GroupRequests } from './pages/student/GroupRequest';
 import { AdminDashboard } from './pages/admin/Dashboard';
 import { SubjectList, SubjectForm, SubjectDetail } from "./components/admin/subjects";
-import { GroupList, DeleteConfirmationModal, GroupDetail} from "./components/admin/groups";
+import { GroupList, GroupDetail, GroupForm} from "./components/admin/groups";
 import './App.css';
 
 function App() {
@@ -52,17 +52,17 @@ function App() {
                         {/* AdminLayout envuelve todas las rutas del administrador */}
                         <Route element={<AdminLayout />}>
                             <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                            {/* Modulo asignaturas */}
                             <Route path="/admin/subjects" element={<SubjectList />} />
                             <Route path="/admin/subjects/new" element={<SubjectForm />} />
                             <Route path="/admin/subjects/:id" element={<SubjectDetail />} />
                             <Route path="/admin/subjects/:id/edit" element={<SubjectForm />} />
 
-                            {/* Futuras rutas de administrador */}
-                            {/* <Route path="/admin/students" element={<StudentList />} /> */}
-                            {/* <Route path="/admin/teachers" element={<TeacherList />} /> */}
+                            {/* Modulo grupos*/}
                             <Route path="/admin/groups" element={<GroupList />} />
                             <Route path="/admin/groups/:id" element={<GroupDetail />} />
-                            {/* <Route path="/admin/requests" element={<RequestList />} /> */}
+                            <Route path="/admin/groups/new" element={<GroupForm />} />
+                            <Route path="/admin/groups/:id/edit" element={<GroupForm />} />
                         </Route>
                     </Route>
 
