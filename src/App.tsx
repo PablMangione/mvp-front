@@ -24,11 +24,9 @@ function App() {
                 <Routes>
                     {/* Ruta raíz - redirige inteligentemente */}
                     <Route path="/" element={<Home />} />
-
                     {/* Rutas públicas */}
                     <Route path="/login" element={<Login />} />
                     <Route path="/register" element={<Register />} />
-
                     {/* Rutas protegidas para estudiantes */}
                     <Route element={<ProtectedRoute allowedRoles={['STUDENT']} />}>
                         {/* StudentLayout envuelve todas las rutas del estudiante */}
@@ -40,13 +38,11 @@ function App() {
                             <Route path="/student/group-requests" element={<GroupRequests />} />
                         </Route>
                     </Route>
-
                     {/* Rutas protegidas para profesores */}
                     <Route element={<ProtectedRoute allowedRoles={['TEACHER']} />}>
                         {/* Aquí irán las rutas de profesores cuando se implementen */}
                         {/* <Route path="/teacher/*" element={<TeacherLayout />} /> */}
                     </Route>
-
                     {/* Rutas protegidas para administradores */}
                     <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                         {/* AdminLayout envuelve todas las rutas del administrador */}
@@ -57,7 +53,6 @@ function App() {
                             <Route path="/admin/subjects/new" element={<SubjectForm />} />
                             <Route path="/admin/subjects/:id" element={<SubjectDetail />} />
                             <Route path="/admin/subjects/:id/edit" element={<SubjectForm />} />
-
                             {/* Modulo grupos*/}
                             <Route path="/admin/groups" element={<GroupList />} />
                             <Route path="/admin/groups/:id" element={<GroupDetail />} />
@@ -65,7 +60,6 @@ function App() {
                             <Route path="/admin/groups/:id/edit" element={<GroupForm />} />
                         </Route>
                     </Route>
-
                     {/* Ruta 404 - Página no encontrada */}
                     {/* <Route path="*" element={<NotFound />} /> */}
                 </Routes>
