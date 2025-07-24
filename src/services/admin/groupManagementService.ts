@@ -190,6 +190,10 @@ class GroupManagementService extends BaseService {
         return this.get<GroupSessionDto[]>(`/groups/${groupId}/sessions/`);
     }
 
+    async getSessionsByClassroomAndTeacher(teacherId: number, classroom: string): Promise<GroupSessionDto[]> {
+        return this.get<GroupSessionDto[]>
+        (`/weekly-schedule/create-group?teacherId=${teacherId}&classroom=${encodeURIComponent(classroom)}`);
+    }
 
 }
 
