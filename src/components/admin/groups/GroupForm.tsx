@@ -11,31 +11,18 @@ import type {
     CreateGroupSessionDto,
     GroupSessionDto
 } from '../../../types/admin.types';
+import { GROUP_TYPES, DAYS_OF_WEEK, CLASSROOMS } from '../../../constants/enums';
 import './GroupForm.css';
 
 /**
  * Componente GroupForm - Formulario unificado para crear y editar grupos.
- *
- * Este componente gestiona:
- * 1. Creación de nuevos grupos con información básica
- * 2. Edición de grupos existentes (solo en estado PLANNED)
- * 3. Gestión de sesiones/horarios del grupo
- * 4. Asignación de profesor y asignatura
- *
- * La gestión de sesiones se maneja de forma separada:
- * - En creación: se pueden definir sesiones iniciales
- * - En edición: se gestionan mediante endpoints específicos de sesiones
  */
 export const GroupForm: React.FC = () => {
     const navigate = useNavigate();
     const { id } = useParams<{ id: string }>();
     const isEditMode = !!id;
 
-    // ========== Estados del formulario ==========
-
-    /**
-     * Datos principales del formulario
-     */
+    // Estados del formulario
     const [formData, setFormData] = useState<CreateCourseGroupDto>({
         subjectId: 0,
         teacherId: undefined,
@@ -44,24 +31,10 @@ export const GroupForm: React.FC = () => {
         sessions: []
     });
 
-    /**
-     * Capacidad máxima (solo para edición)
-     */
     const [maxCapacity, setMaxCapacity] = useState<number>(30);
-
-    /**
-     * Grupo original (para edición)
-     */
     const [originalGroup, setOriginalGroup] = useState<CourseGroupDto | null>(null);
-
-    /**
-     * Sesiones del grupo (para mostrar en edición)
-     */
     const [existingSessions, setExistingSessions] = useState<GroupSessionDto[]>([]);
 
-    /**
-     * Estados para campos tocados
-     */
     const [touched, setTouched] = useState<Record<string, boolean>>({
         subjectId: false,
         teacherId: false,
@@ -70,33 +43,16 @@ export const GroupForm: React.FC = () => {
         maxCapacity: false
     });
 
-    /**
-     * Errores de validación
-     */
     const [errors, setErrors] = useState<Record<string, string>>({});
-
-    /**
-     * Listas para los selects
-     */
     const [subjects, setSubjects] = useState<SubjectDto[]>([]);
     const [teachers, setTeachers] = useState<TeacherDto[]>([]);
 
-    /**
-     * Estados de carga
-     */
     const [loadingGroup, setLoadingGroup] = useState(false);
     const [loadingSubjects, setLoadingSubjects] = useState(true);
     const [loadingTeachers, setLoadingTeachers] = useState(true);
     const [saving, setSaving] = useState(false);
-
-    /**
-     * Error de envío
-     */
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    /**
-     * Estado de la sesión temporal para agregar
-     */
     const [newSession, setNewSession] = useState<CreateGroupSessionDto>({
         dayOfWeek: 'MONDAY',
         startTime: '09:00:00',
@@ -104,41 +60,20 @@ export const GroupForm: React.FC = () => {
         classroom: ''
     });
 
-    /**
-     * Modal de sesiones
-     */
     const [showSessionModal, setShowSessionModal] = useState(false);
 
-    // ========== Tipos de grupo disponibles ==========
-    const groupTypes = [
-        { value: 'REGULAR', label: 'Regular' },
-        { value: 'INTENSIVE', label: 'Intensivo' },
-        { value: 'REMEDIAL', label: 'Remedial' },
-        { value: 'SUMMER', label: 'Verano' }
-    ];
-
-    // ========== Días de la semana ==========
-    const daysOfWeek = [
-        { value: 'MONDAY', label: 'Lunes' },
-        { value: 'TUESDAY', label: 'Martes' },
-        { value: 'WEDNESDAY', label: 'Miércoles' },
-        { value: 'THURSDAY', label: 'Jueves' },
-        { value: 'FRIDAY', label: 'Viernes' },
-        { value: 'SATURDAY', label: 'Sábado' },
-        { value: 'SUNDAY', label: 'Domingo' }
-    ];
-
-    // ========== Efectos ==========
-
+    // Efectos
     useEffect(() => {
         loadInitialData();
     }, [id]);
 
-    // ========== Carga de datos ==========
+    useEffect(() => {
+        validateForm();
+    }, [formData, maxCapacity]);
 
+    // Carga de datos
     const loadInitialData = async () => {
         try {
-            // Cargar listas en paralelo
             const loadPromises = [loadSubjects(), loadTeachers()];
 
             if (isEditMode && id) {
@@ -167,12 +102,13 @@ export const GroupForm: React.FC = () => {
     const loadTeachers = async () => {
         try {
             setLoadingTeachers(true);
-            // Cargar todos los profesores sin paginación
-            const response = await teacherManagementService.getAllTeachers({ size: 1000 });
-            setTeachers(response.content);
+            console.log("cargando profesores");
+            const data = await teacherManagementService.getAllTeachers();
+            console.log(data);
+            setTeachers(data); // Directamente es un array
         } catch (error) {
             console.error('Error al cargar profesores:', error);
-            setErrors(prev => ({ ...prev, general: 'Error al cargar los profesores' }));
+            setTeachers([]);
         } finally {
             setLoadingTeachers(false);
         }
@@ -181,44 +117,90 @@ export const GroupForm: React.FC = () => {
     const loadGroup = async (groupId: number) => {
         try {
             setLoadingGroup(true);
-            const [group, sessions] = await Promise.all([
-                groupManagementService.getGroupById(groupId),
-                groupManagementService.getGroupSessions(groupId)
-            ]);
+            const group = await groupManagementService.getGroupById(groupId);
+
+            // Verificar si el grupo puede ser editado
+            if (group.status !== 'PLANNED') {
+                setSubmitError('Solo se pueden editar grupos en estado PLANIFICADO');
+                return;
+            }
 
             setOriginalGroup(group);
-            setExistingSessions(sessions);
-            setMaxCapacity(group.maxCapacity);
 
-            // Poblar el formulario con los datos del grupo
+            // Llenar el formulario con los datos del grupo
             setFormData({
                 subjectId: group.subjectId,
-                teacherId: group.teacherId,
+                teacherId: group.teacherId || undefined,
                 type: group.type,
                 price: group.price,
-                sessions: [] // Las sesiones existentes se manejan por separado
+                sessions: []
             });
+
+            setMaxCapacity(group.maxCapacity);
+
+            // Cargar sesiones existentes
+            try {
+                const sessions = await groupManagementService.getGroupSessions(groupId);
+                setExistingSessions(sessions);
+            } catch (error) {
+                console.error('Error al cargar sesiones:', error);
+            }
         } catch (error) {
             console.error('Error al cargar el grupo:', error);
-            setSubmitError('Error al cargar la información del grupo');
+            setSubmitError('Error al cargar los datos del grupo');
         } finally {
             setLoadingGroup(false);
         }
     };
 
-    // ========== Manejadores de cambios ==========
+    // Validación
+    const validateForm = () => {
+        const newErrors: Record<string, string> = {};
 
+        if (!formData.subjectId || formData.subjectId === 0) {
+            newErrors.subjectId = 'La asignatura es requerida';
+        }
+
+        if (!formData.type) {
+            newErrors.type = 'El tipo de grupo es requerido';
+        }
+
+        if (formData.price < 0) {
+            newErrors.price = 'El precio no puede ser negativo';
+        }
+
+        if (isEditMode && maxCapacity < 1) {
+            newErrors.maxCapacity = 'La capacidad debe ser al menos 1';
+        }
+
+        if (isEditMode && originalGroup && maxCapacity < originalGroup.enrolledStudents) {
+            newErrors.maxCapacity = `La capacidad no puede ser menor que los estudiantes inscritos (${originalGroup.enrolledStudents})`;
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Manejadores de eventos
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
 
         if (name === 'maxCapacity') {
             setMaxCapacity(parseInt(value) || 0);
+        } else if (name === 'subjectId' || name === 'teacherId') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: parseInt(value) || (name === 'teacherId' ? undefined : 0)
+            }));
+        } else if (name === 'price') {
+            setFormData(prev => ({
+                ...prev,
+                [name]: parseFloat(value) || 0
+            }));
         } else {
             setFormData(prev => ({
                 ...prev,
-                [name]: name === 'subjectId' || name === 'teacherId' || name === 'price'
-                    ? (value ? parseInt(value) : (name === 'teacherId' ? undefined : 0))
-                    : value
+                [name]: value
             }));
         }
 
@@ -234,94 +216,25 @@ export const GroupForm: React.FC = () => {
     const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name } = e.target;
         setTouched(prev => ({ ...prev, [name]: true }));
-        validateField(name, e.target.value);
     };
-
-    // ========== Validación ==========
-
-    const validateField = (name: string, value: any) => {
-        let error = '';
-
-        switch (name) {
-            case 'subjectId':
-                if (!value || value === '0') {
-                    error = 'Debe seleccionar una asignatura';
-                }
-                break;
-            case 'type':
-                if (!value) {
-                    error = 'Debe seleccionar un tipo de grupo';
-                }
-                break;
-            case 'price':
-                const price = parseInt(value);
-                if (isNaN(price) || price < 0) {
-                    error = 'El precio debe ser un número positivo';
-                }
-                break;
-            case 'maxCapacity':
-                const capacity = parseInt(value);
-                if (isNaN(capacity) || capacity < 1) {
-                    error = 'La capacidad debe ser al menos 1';
-                }
-                if (isEditMode && originalGroup && capacity < originalGroup.enrolledStudents) {
-                    error = `La capacidad no puede ser menor a los estudiantes inscritos (${originalGroup.enrolledStudents})`;
-                }
-                break;
-        }
-
-        setErrors(prev => ({ ...prev, [name]: error }));
-        return error === '';
-    };
-
-    const validateForm = (): boolean => {
-        const newErrors: Record<string, string> = {};
-
-        if (!formData.subjectId || formData.subjectId === 0) {
-            newErrors.subjectId = 'Debe seleccionar una asignatura';
-        }
-
-        if (!formData.type) {
-            newErrors.type = 'Debe seleccionar un tipo de grupo';
-        }
-
-        if (formData.price < 0) {
-            newErrors.price = 'El precio debe ser un número positivo';
-        }
-
-        if (isEditMode) {
-            if (maxCapacity < 1) {
-                newErrors.maxCapacity = 'La capacidad debe ser al menos 1';
-            }
-            if (originalGroup && maxCapacity < originalGroup.enrolledStudents) {
-                newErrors.maxCapacity = `La capacidad no puede ser menor a los estudiantes inscritos (${originalGroup.enrolledStudents})`;
-            }
-        }
-
-        setErrors(newErrors);
-        return Object.keys(newErrors).length === 0;
-    };
-
-    // ========== Gestión de sesiones ==========
 
     const handleAddSession = () => {
         if (!newSession.classroom.trim()) {
-            alert('Debe especificar un aula');
+            alert('El aula es requerida');
             return;
         }
 
-        // Validar que la hora de fin sea posterior a la de inicio
-        if (newSession.endTime <= newSession.startTime) {
-            alert('La hora de fin debe ser posterior a la hora de inicio');
-            return;
-        }
+        const session: CreateGroupSessionDto = {
+            ...newSession,
+            classroom: newSession.classroom.trim()
+        };
 
         setFormData(prev => ({
             ...prev,
-            sessions: [...(prev.sessions || []), { ...newSession }]
+            sessions: [...prev.sessions, session]
         }));
 
-        // Resetear el formulario de sesión
+        // Reset session form
         setNewSession({
             dayOfWeek: 'MONDAY',
             startTime: '09:00:00',
@@ -335,20 +248,23 @@ export const GroupForm: React.FC = () => {
     const handleRemoveSession = (index: number) => {
         setFormData(prev => ({
             ...prev,
-            sessions: prev.sessions?.filter((_, i) => i !== index) || []
+            sessions: prev.sessions.filter((_, i) => i !== index)
         }));
     };
-
-    const formatTime = (time: string) => {
-        // Convertir HH:mm:ss a HH:mm para mostrar
-        return time.substring(0, 5);
-    };
-
-    // ========== Envío del formulario ==========
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
+        // Marcar todos los campos como tocados
+        setTouched({
+            subjectId: true,
+            teacherId: true,
+            type: true,
+            price: true,
+            maxCapacity: true
+        });
+
+        // Validar
         if (!validateForm()) {
             return;
         }
@@ -357,61 +273,61 @@ export const GroupForm: React.FC = () => {
             setSaving(true);
             setSubmitError(null);
 
-            if (isEditMode && originalGroup) {
-                // Construir el DTO completo para actualización
-                const updateData: CourseGroupDto = {
-                    ...originalGroup,
-                    subjectId: formData.subjectId,
-                    teacherId: formData.teacherId || 0,
+            if (isEditMode && id) {
+                // Actualizar grupo
+                const updateData = {
+                    teacherId: formData.teacherId,
                     type: formData.type,
                     price: formData.price,
                     maxCapacity: maxCapacity
                 };
 
-                await groupManagementService.updateGroup(parseInt(id!), updateData);
-
-                // Las sesiones se gestionan por separado en edición
-                navigate('/admin/groups');
+                await groupManagementService.updateGroup(parseInt(id), updateData);
+                navigate('/admin/groups', {
+                    state: { message: 'Grupo actualizado exitosamente' }
+                });
             } else {
-                // Crear nuevo grupo
+                // Crear grupo
+                if (!isEditMode && formData.sessions.length === 0) {
+                    setSubmitError('Debe agregar al menos una sesión al grupo');
+                    return;
+                }
+
                 await groupManagementService.createGroup(formData);
-                navigate('/admin/groups');
+                navigate('/admin/groups', {
+                    state: { message: 'Grupo creado exitosamente' }
+                });
             }
         } catch (error: any) {
             console.error('Error al guardar el grupo:', error);
-            setSubmitError(
-                error.response?.data?.message ||
-                error.message ||
-                'Error al guardar el grupo'
-            );
+            const message = error.response?.data?.message || 'Error al guardar el grupo';
+            setSubmitError(message);
         } finally {
             setSaving(false);
         }
     };
 
-    // ========== Renderizado ==========
+    const handleCancel = () => {
+        navigate('/admin/groups');
+    };
 
-    if (loadingGroup || loadingSubjects || loadingTeachers) {
+    // Renderizado condicional para estados de carga
+    if (loadingGroup) {
         return (
             <div className="group-form__loading">
                 <div className="spinner"></div>
-                <p>Cargando información...</p>
+                <p>Cargando información del grupo...</p>
             </div>
         );
     }
 
-    // No permitir edición de grupos que no están en estado PLANNED
-    if (isEditMode && originalGroup && originalGroup.status !== 'PLANNED') {
+    if (isEditMode && submitError && originalGroup === null) {
         return (
             <div className="group-form__container">
-                <div className="group-form__error-state">
-                    <h2>Grupo no editable</h2>
-                    <p>Solo se pueden editar grupos en estado PLANNED.</p>
-                    <p>Este grupo está en estado: <strong>{originalGroup.status}</strong></p>
-                    <button
-                        onClick={() => navigate('/admin/groups')}
-                        className="btn btn--secondary"
-                    >
+                <div className="group-form group-form__error-state">
+                    <h2>Error al cargar el grupo</h2>
+                    <p>{submitError}</p>
+                    <button onClick={() => navigate('/admin/groups')} className="btn btn--primary">
                         Volver a la lista
                     </button>
                 </div>
@@ -419,6 +335,7 @@ export const GroupForm: React.FC = () => {
         );
     }
 
+    // Renderizado principal del formulario
     return (
         <div className="group-form__container">
             <form onSubmit={handleSubmit} className="group-form">
@@ -476,12 +393,11 @@ export const GroupForm: React.FC = () => {
                                     { value: '', label: 'Sin asignar' },
                                     ...teachers.map(teacher => ({
                                         value: teacher.id!.toString(),
-                                        label: teacher.name
+                                        label: `${teacher.name} - ${teacher.email}`
                                     }))
                                 ]}
                                 error={errors.teacherId}
                                 touched={touched.teacherId}
-                                helperText="Puede asignar un profesor ahora o después"
                             />
 
                             <FormField
@@ -491,7 +407,7 @@ export const GroupForm: React.FC = () => {
                                 value={formData.type}
                                 onChange={handleChange}
                                 onBlur={handleBlur}
-                                options={groupTypes}
+                                options={GROUP_TYPES}
                                 error={errors.type}
                                 touched={touched.type}
                                 required
@@ -552,8 +468,8 @@ export const GroupForm: React.FC = () => {
                                 <ul className="group-form__session-list">
                                     {existingSessions.map((session, index) => (
                                         <li key={index}>
-                                            {daysOfWeek.find(d => d.value === session.dayOfWeek)?.label || session.dayOfWeek} -
-                                            {formatTime(session.startTime)} a {formatTime(session.endTime)} -
+                                            {DAYS_OF_WEEK.find(d => d.value === session.dayOfWeek)?.label} -
+                                            {session.startTime.substring(0, 5)} a {session.endTime.substring(0, 5)} -
                                             Aula: {session.classroom}
                                         </li>
                                     ))}
@@ -561,45 +477,31 @@ export const GroupForm: React.FC = () => {
                             </div>
                         )}
 
-                        {!isEditMode && formData.sessions && formData.sessions.length > 0 && (
-                            <div className="group-form__sessions">
-                                <table className="group-form__sessions-table">
-                                    <thead>
-                                    <tr>
-                                        <th>Día</th>
-                                        <th>Hora Inicio</th>
-                                        <th>Hora Fin</th>
-                                        <th>Aula</th>
-                                        <th>Acciones</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                    {formData.sessions.map((session, index) => (
-                                        <tr key={index}>
-                                            <td>{daysOfWeek.find(d => d.value === session.dayOfWeek)?.label}</td>
-                                            <td>{formatTime(session.startTime)}</td>
-                                            <td>{formatTime(session.endTime)}</td>
-                                            <td>{session.classroom}</td>
-                                            <td>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => handleRemoveSession(index)}
-                                                    className="btn btn--small btn--danger"
-                                                >
-                                                    Eliminar
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                    </tbody>
-                                </table>
+                        {!isEditMode && formData.sessions.length === 0 && (
+                            <div className="group-form__empty-sessions">
+                                <p>No hay sesiones agregadas. Haga clic en "Agregar Sesión" para añadir horarios.</p>
                             </div>
                         )}
 
-                        {!isEditMode && (!formData.sessions || formData.sessions.length === 0) && (
-                            <p className="group-form__empty-state">
-                                No se han agregado sesiones. Puede crear el grupo sin horario y agregarlo después.
-                            </p>
+                        {!isEditMode && formData.sessions.length > 0 && (
+                            <div className="group-form__sessions-list">
+                                {formData.sessions.map((session, index) => (
+                                    <div key={index} className="session-item">
+                                        <span>
+                                            {DAYS_OF_WEEK.find(d => d.value === session.dayOfWeek)?.label} -
+                                            {session.startTime.substring(0, 5)} a {session.endTime.substring(0, 5)} -
+                                            Aula: {session.classroom}
+                                        </span>
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveSession(index)}
+                                            className="btn btn--small btn--danger"
+                                        >
+                                            Eliminar
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
                         )}
                     </div>
                 </div>
@@ -607,7 +509,7 @@ export const GroupForm: React.FC = () => {
                 <div className="group-form__actions">
                     <button
                         type="button"
-                        onClick={() => navigate('/admin/groups')}
+                        onClick={handleCancel}
                         className="btn btn--secondary"
                         disabled={saving}
                     >
@@ -616,7 +518,7 @@ export const GroupForm: React.FC = () => {
                     <button
                         type="submit"
                         className="btn btn--primary"
-                        disabled={saving}
+                        disabled={saving || loadingSubjects || loadingTeachers}
                     >
                         {saving ? 'Guardando...' : (isEditMode ? 'Actualizar Grupo' : 'Crear Grupo')}
                     </button>
@@ -624,46 +526,44 @@ export const GroupForm: React.FC = () => {
             </form>
 
             {/* Modal para agregar sesión */}
-            {showSessionModal && !isEditMode && (
+            {showSessionModal && (
                 <div className="modal-overlay" onClick={() => setShowSessionModal(false)}>
-                    <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+                    <div className="modal-content" onClick={e => e.stopPropagation()}>
                         <h3>Agregar Sesión</h3>
                         <div className="modal-form">
                             <FormField
                                 type="select"
-                                label="Día de la Semana"
+                                label="Día de la semana"
                                 name="dayOfWeek"
                                 value={newSession.dayOfWeek}
                                 onChange={(e) => setNewSession(prev => ({ ...prev, dayOfWeek: e.target.value }))}
-                                options={daysOfWeek}
+                                options={DAYS_OF_WEEK}
                             />
                             <FormField
                                 type="time"
-                                label="Hora de Inicio"
+                                label="Hora de inicio"
                                 name="startTime"
-                                value={formatTime(newSession.startTime)}
-                                onChange={(e) => setNewSession(prev => ({
-                                    ...prev,
-                                    startTime: e.target.value + ':00'
-                                }))}
+                                value={newSession.startTime.substring(0, 5)}
+                                onChange={(e) => setNewSession(prev => ({ ...prev, startTime: `${e.target.value}:00` }))}
                             />
                             <FormField
                                 type="time"
-                                label="Hora de Fin"
+                                label="Hora de fin"
                                 name="endTime"
-                                value={formatTime(newSession.endTime)}
-                                onChange={(e) => setNewSession(prev => ({
-                                    ...prev,
-                                    endTime: e.target.value + ':00'
-                                }))}
+                                value={newSession.endTime.substring(0, 5)}
+                                onChange={(e) => setNewSession(prev => ({ ...prev, endTime: `${e.target.value}:00` }))}
                             />
                             <FormField
-                                type="text"
+                                type="select"
                                 label="Aula"
                                 name="classroom"
                                 value={newSession.classroom}
                                 onChange={(e) => setNewSession(prev => ({ ...prev, classroom: e.target.value }))}
-                                placeholder="Ej: A-101"
+                                options={[
+                                    { value: '', label: 'Seleccione un aula...' },
+                                    ...CLASSROOMS
+                                ]}
+                                required
                             />
                         </div>
                         <div className="modal-actions">

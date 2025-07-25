@@ -89,64 +89,12 @@ type FormFieldProps = InputFieldProps | SelectFieldProps | TextareaFieldProps;
 
 /**
  * Componente FormField - El bloque de construcción fundamental para formularios.
- *
- * Este componente encapsula la complejidad de crear campos de formulario accesibles
- * y consistentes. Maneja automáticamente:
- *
- * 1. **Accesibilidad**: IDs únicos, asociación label-input, ARIA attributes
- * 2. **Estados visuales**: Normal, focus, error, disabled
- * 3. **Validación**: Muestra errores de forma consistente
- * 4. **Responsive**: Se adapta a diferentes tamaños de pantalla
- * 5. **Flexibilidad**: Soporta diferentes tipos de campos
- *
- * El componente utiliza forwardRef para permitir que los formularios
- * accedan directamente al elemento del DOM cuando sea necesario.
- *
- * @example
- * ```typescript
- * // Input de texto simple
- * <FormField
- *   label="Nombre"
- *   name="name"
- *   value={formData.name}
- *   onChange={handleChange}
- *   error={errors.name}
- *   required
- * />
- *
- * // Select con opciones
- * <FormField
- *   type="select"
- *   label="Carrera"
- *   name="major"
- *   value={formData.major}
- *   onChange={handleChange}
- *   options={[
- *     { value: '', label: 'Seleccione...' },
- *     { value: 'ing-sistemas', label: 'Ingeniería en Sistemas' },
- *     { value: 'ing-civil', label: 'Ingeniería Civil' }
- *   ]}
- *   required
- * />
- *
- * // Textarea para comentarios
- * <FormField
- *   type="textarea"
- *   label="Descripción"
- *   name="description"
- *   value={formData.description}
- *   onChange={handleChange}
- *   rows={4}
- *   helperText="Máximo 500 caracteres"
- * />
- * ```
  */
 export const FormField = forwardRef<
     HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement,
     FormFieldProps
 >((props, ref) => {
     // Generar un ID único si no se proporciona uno
-    // Esto es crucial para la accesibilidad (asociar label con input)
     const generatedId = useId();
     const fieldId = props.id || `field-${generatedId}`;
 
@@ -167,7 +115,20 @@ export const FormField = forwardRef<
     const renderField = () => {
         // Para campos select
         if (props.type === 'select') {
-            const { options, multiple, ...selectProps } = props;
+            const {
+                options,
+                multiple,
+                // Extraer props que no deben ir al DOM
+                label,
+                error,
+                touched,
+                fullWidth,
+                className,
+                helperText,
+                // Todas las demás props van al select
+                ...selectProps
+            } = props;
+
             return (
                 <select
                     ref={ref as React.Ref<HTMLSelectElement>}
@@ -195,7 +156,22 @@ export const FormField = forwardRef<
 
         // Para campos textarea
         if (props.type === 'textarea') {
-            const { rows = 3, resize = 'vertical', maxLength, ...textareaProps } = props;
+            const {
+                rows = 3,
+                resize = 'vertical',
+                maxLength,
+                // Extraer props que no deben ir al DOM
+                label,
+                error,
+                touched,
+                fullWidth,
+                className,
+                helperText,
+                type,
+                // Todas las demás props van al textarea
+                ...textareaProps
+            } = props;
+
             return (
                 <textarea
                     ref={ref as React.Ref<HTMLTextAreaElement>}
@@ -215,7 +191,19 @@ export const FormField = forwardRef<
         }
 
         // Para campos input (tipo por defecto)
-        const { type = 'text', ...inputProps } = props as InputFieldProps;
+        const {
+            type = 'text',
+            // Extraer props que no deben ir al DOM
+            label,
+            error,
+            touched,
+            fullWidth,
+            className,
+            helperText,
+            // Todas las demás props van al input
+            ...inputProps
+        } = props as InputFieldProps;
+
         return (
             <input
                 ref={ref as React.Ref<HTMLInputElement>}
@@ -262,7 +250,7 @@ export const FormField = forwardRef<
 
             {/* Mensajes debajo del campo */}
             {/* Texto de ayuda - siempre visible si existe */}
-            {props.helperText && !props.error && (
+            {props.helperText && !(props.error && props.touched) && (
                 <p id={`${fieldId}-helper`} className="form-field__helper-text">
                     {props.helperText}
                 </p>
@@ -284,19 +272,6 @@ FormField.displayName = 'FormField';
 /**
  * Hook personalizado para gestionar el estado de un formulario.
  * Este es un helper opcional que simplifica el manejo de formularios.
- *
- * @example
- * ```typescript
- * const { values, errors, touched, handleChange, handleBlur, setFieldError } = useFormField({
- *   initialValues: { name: '', email: '' },
- *   validate: (values) => {
- *     const errors = {};
- *     if (!values.name) errors.name = 'El nombre es requerido';
- *     if (!values.email) errors.email = 'El email es requerido';
- *     return errors;
- *   }
- * });
- * ```
  */
 export const useFormField = <T extends Record<string, any>>(config: {
     initialValues: T;

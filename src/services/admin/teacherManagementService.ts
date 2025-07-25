@@ -35,18 +35,8 @@ class TeacherManagementService extends BaseService {
      * docente. La paginación permite manejar eficientemente grandes
      * cantidades de profesores en instituciones de cualquier tamaño.
      */
-    async getAllTeachers(params?: PageRequest): Promise<PageResponseDto<TeacherDto>> {
-        const queryParams = new URLSearchParams();
-
-        // Construir los parámetros de consulta de forma segura
-        if (params?.page !== undefined) queryParams.append('page', params.page.toString());
-        if (params?.size !== undefined) queryParams.append('size', params.size.toString());
-        if (params?.sort) queryParams.append('sort', params.sort);
-
-        const queryString = queryParams.toString();
-        const endpoint = queryString ? `/teachers?${queryString}` : '/teachers';
-
-        return this.get<PageResponseDto<TeacherDto>>(endpoint);
+    async getAllTeachers(): Promise<TeacherDto[]> {
+        return this.get<TeacherDto[]>('/teachers');
     }
 
     /**

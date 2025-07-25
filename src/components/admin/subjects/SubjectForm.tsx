@@ -5,6 +5,8 @@ import { FormField } from '../forms/FormField';
 import { subjectManagementService } from '../../../services/admin';
 import type { CreateSubjectDto, UpdateSubjectDto } from '../../../types/admin.types';
 import './SubjectForm.css';
+import { MAJORS, COURSE_YEARS } from '../../../constants/enums';
+
 
 /**
  * Componente SubjectForm - Formulario unificado para crear y editar asignaturas.
@@ -68,30 +70,6 @@ export const SubjectForm: React.FC = () => {
     const [saving, setSaving] = useState(false);
     const [submitError, setSubmitError] = useState<string | null>(null);
 
-    /**
-     * Lista de carreras disponibles en el sistema.
-     * En una implementación completa, esto vendría de una API o configuración.
-     * Por ahora usamos una lista estática que coincide con el backend.
-     */
-    const availableMajors = [
-        { value: 'Ingeniería en Sistemas', label: 'Ingeniería en Sistemas' },
-        { value: 'Ingeniería Civil', label: 'Ingeniería Civil' },
-        { value: 'Arquitectura', label: 'Arquitectura' },
-        { value: 'Administración de Empresas', label: 'Administración de Empresas' },
-        { value: 'Contaduría Pública', label: 'Contaduría Pública' },
-        { value: 'Derecho', label: 'Derecho' },
-        { value: 'Medicina', label: 'Medicina' },
-        { value: 'Psicología', label: 'Psicología' }
-    ];
-
-    /**
-     * Años de curso disponibles (típicamente 1-6 para carreras universitarias).
-     * Generamos dinámicamente las opciones para facilitar cambios futuros.
-     */
-    const courseYearOptions = Array.from({ length: 4 }, (_, i) => ({
-        value: (i + 1).toString(),
-        label: `${i + 1}° año`
-    }));
 
     // ========== Efectos ==========
 
@@ -376,7 +354,7 @@ export const SubjectForm: React.FC = () => {
                     required
                     options={[
                         { value: '', label: 'Seleccione una carrera...' },
-                        ...availableMajors
+                        ...MAJORS
                     ]}
                     helperText="Seleccione la carrera a la que pertenece esta asignatura"
                 />
@@ -395,7 +373,7 @@ export const SubjectForm: React.FC = () => {
                     error={errors.courseYear}
                     touched={touched.courseYear}
                     required
-                    options={courseYearOptions}
+                    options={COURSE_YEARS}
                     helperText="Seleccione el año en que se cursa esta asignatura"
                 />
 
