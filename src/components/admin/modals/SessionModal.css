@@ -1,6 +1,8 @@
+/* src/components/admin/modals/SessionModal.css */
+
 /* Modal específico para sesiones */
 .session-modal {
-    max-width: 500px;
+    max-width: 600px;
     width: 100%;
 }
 
@@ -24,6 +26,7 @@
     border-radius: 6px;
     font-size: 0.875rem;
     transition: border-color 0.2s, box-shadow 0.2s;
+    background-color: #ffffff;
 }
 
 .form-control:focus {
@@ -32,11 +35,142 @@
     box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
-/* Fila de formulario para campos lado a lado */
-.form-row {
+.form-control:disabled {
+    background-color: #f3f4f6;
+    cursor: not-allowed;
+}
+
+/* Presets de tiempo */
+.time-presets {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.time-preset-btn {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.813rem;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #374151;
+}
+
+.time-preset-btn:hover {
+    background-color: #e5e7eb;
+    border-color: #9ca3af;
+}
+
+.time-preset-btn:active {
+    transform: scale(0.95);
+}
+
+.time-preset-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Fila de inputs de tiempo */
+.time-inputs-row {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr auto 1fr;
     gap: 1rem;
+    align-items: end;
+}
+
+/* Grupo de input de tiempo */
+.time-input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.time-input-group label {
+    font-size: 0.813rem;
+    margin-bottom: 0.375rem;
+}
+
+/* Wrapper para input de tiempo con botones */
+.time-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Ajustadores de tiempo */
+.time-adjusters {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+}
+
+.time-adjuster {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background-color: #f3f4f6;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #374151;
+    min-width: 32px;
+}
+
+.time-adjuster:hover {
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+}
+
+.time-adjuster:active {
+    transform: scale(0.9);
+}
+
+.time-adjuster:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Grupo de duración */
+.duration-group {
+    display: flex;
+    flex-direction: column;
+    align-self: stretch;
+}
+
+.duration-group label {
+    font-size: 0.813rem;
+    margin-bottom: 0.375rem;
+}
+
+/* Indicador de duración */
+.duration-indicator {
+    margin-top: 0.75rem;
+    padding: 0.75rem;
+    background-color: #f0f9ff;
+    border: 1px solid #bae6fd;
+    border-radius: 6px;
+    text-align: center;
+}
+
+.duration-text {
+    color: #0369a1;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Footer del modal */
+.modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e5e7eb;
 }
 
 /* Animaciones */
@@ -56,51 +190,53 @@
     }
 }
 
+.modal-overlay {
+    animation: fadeIn 0.2s ease-out;
+}
+
+.session-modal {
+    animation: slideIn 0.3s ease-out;
+}
+
 /* Responsive */
 @media (max-width: 640px) {
     .session-modal {
         max-width: calc(100vw - 2rem);
+        margin: 1rem;
     }
 
-    .form-row {
+    .time-inputs-row {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .time-presets {
+        justify-content: center;
+    }
+
+    .time-adjusters {
+        margin-top: 0.5rem;
     }
 }
 
-/* Wrapper para inputs de tiempo con botones */
-.time-input-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-/* Botones de ajuste de tiempo */
-.time-arrows {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.time-arrow {
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-    background-color: #f3f4f6;
-    border: 1px solid #d1d5db;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.time-arrow:hover {
-    background-color: #e5e7eb;
+/* Estados de hover y focus mejorados */
+.form-control:hover:not(:disabled) {
     border-color: #9ca3af;
 }
 
-.time-arrow:active {
-    transform: scale(0.95);
+select.form-control {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+    appearance: none;
 }
 
-/* Ajustar el ancho del input de tiempo cuando hay botones */
-.time-input-wrapper .form-control {
-    flex: 1;
+/* Mejoras de accesibilidad */
+.time-adjuster:focus-visible,
+.time-preset-btn:focus-visible {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
 }
