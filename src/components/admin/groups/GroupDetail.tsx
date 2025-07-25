@@ -2,8 +2,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { groupManagementService } from '../../../services/admin';
-import { WeeklySchedule, type ScheduleSession } from '../../common/WeeklySchedule';
+import { WeeklySchedule, type ScheduleSession } from '../../common';
 import type { CourseGroupDto, GroupSessionDto } from '../../../types/admin.types';
+import { StudentListModal } from '../modals/StudentListModal';
+import { SessionModal } from '../modals/SessionModal';
 import './GroupDetail.css';
 
 /**
@@ -23,6 +25,13 @@ export const GroupDetail: React.FC = () => {
     const [group, setGroup] = useState<CourseGroupDto | null>(null);
     const [sessions, setSessions] = useState<GroupSessionDto[]>([]);
     const [showSchedule, setShowSchedule] = useState(false);
+
+    const [showStudentModal, setShowStudentModal] = useState(false);
+    const [students, setStudents] = useState<any[]>([]);
+    const [loadingStudents, setLoadingStudents] = useState(false);
+
+    const [showSessionModal, setShowSessionModal] = useState(false);
+    const [addingSession, setAddingSession] = useState(false);
 
     // Estados de carga
     const [loadingGroup, setLoadingGroup] = useState(true);
@@ -71,6 +80,44 @@ export const GroupDetail: React.FC = () => {
             setSessionsError('No se pudieron cargar las sesiones del grupo.');
         } finally {
             setLoadingSessions(false);
+        }
+    };
+
+    // Cargar estudiantes del grupo
+    const loadStudents = async () => {
+        if (!id) return;
+
+        try {
+            setLoadingStudents(true);
+            const data = await groupManagementService.getStudentsByGroup(parseInt(id));
+            setStudents(data);
+            setShowStudentModal(true);
+        } catch (error) {
+            console.error('Error al cargar estudiantes:', error);
+            alert('No se pudieron cargar los estudiantes del grupo.');
+        } finally {
+            setLoadingStudents(false);
+        }
+    };
+
+    // Manejar agregar nueva sesión
+    const handleAddSession = async (sessionData: any) => {
+        if (!id) return;
+
+        try {
+            setAddingSession(true);
+            await groupManagementService.addGroupSession(parseInt(id), sessionData);
+
+            // Recargar las sesiones
+            await loadSessions();
+
+            setShowSessionModal(false);
+            alert('Sesión agregada exitosamente');
+        } catch (error) {
+            console.error('Error al agregar sesión:', error);
+            alert('Error al agregar la sesión. Por favor intente nuevamente.');
+        } finally {
+            setAddingSession(false);
         }
     };
 
@@ -236,14 +283,16 @@ export const GroupDetail: React.FC = () => {
                             👨‍🏫 Asignar Profesor
                         </button>
                         <button
-                            className="action-btn"
-                            onClick={() => navigate(`/admin/groups/${group.id}/students`)}
+                            className="btn btn--secondary"
+                            onClick={loadStudents}
+                            disabled={loadingStudents || group.enrolledStudents === 0}
                         >
-                            👥 Ver Estudiantes
+                            {loadingStudents ? 'Cargando...' : 'Mostrar Estudiantes'}
                         </button>
                         <button
-                            className="action-btn"
-                            onClick={() => navigate(`/admin/groups/${group.id}/sessions/new`)}
+                            type="button"
+                            onClick={() => setShowSessionModal(true)}
+                            className="btn btn--small btn--secondary"
                         >
                             ➕ Añadir Sesión
                         </button>
@@ -302,6 +351,23 @@ export const GroupDetail: React.FC = () => {
                     </>
                 )}
             </div>
+            {/* Modal de estudiantes */}
+            <StudentListModal
+                isOpen={showStudentModal}
+                onClose={() => setShowStudentModal(false)}
+                students={students}
+                groupName={`${group.subjectName} - Grupo ${group.id}`}
+            />
+            {/* Modal de agregar sesión */}
+            {showSessionModal && (
+                <SessionModal
+                    isOpen={showSessionModal}
+                    onClose={() => setShowSessionModal(false)}
+                    onSave={handleAddSession}
+                    groupId={parseInt(id!)}
+                    saving={addingSession}
+                />
+            )}
         </div>
     );
 };
